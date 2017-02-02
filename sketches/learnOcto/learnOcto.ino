@@ -56,7 +56,8 @@ typedef uint32_t COLOR;
 
 const int ledsPerStrip = 456;
 const int nStrips = 3;
-int nLeds = ledsPerStrip * nStrips;
+uint16_t nLeds = ledsPerStrip * nStrips;
+int ledsPerSegment = 114;
 
 DMAMEM int displayMemory[ledsPerStrip*6];
 int drawingMemory[ledsPerStrip*6];
@@ -70,15 +71,32 @@ void setup() {
 }
 
 void loop() {
-  setAllGray(255);
+  clear();
+  setSegment(0, 0, 255, 48, 0);
   leds.show();
   delay(500);
-  setAllColor(0xff0088);
+  clear();
+  setSegment(0, 1, 255, 0, 128);
   leds.show();
   delay(500);
-  setAllRGB(255, 128, 0);
-  leds.show();
-  delay(500);
+}
+
+
+void setSegment(int stripNumber, int segmentNumber, int r, int g, int b) {
+  uint16_t start = stripNumber * ledsPerStrip + segmentNumber * ledsPerSegment;
+  uint16_t end = start + ledsPerSegment;
+  for (uint16_t i = start; i < end; i++) {
+    leds.setPixel(i, (r << 16) | (g << 8) | b);
+  }  
+}
+
+void setStrip(int stripNumber, int r, int g, int b) {
+  uint16_t start = stripNumber * ledsPerStrip;
+  uint16_t end = start + ledsPerStrip;
+  
+  for (uint16_t i = start; i < end; i++) {
+    leds.setPixel(i, (r << 16) | (g << 8) | b);
+  }
 }
 
 // Set all gray scale
@@ -103,7 +121,10 @@ void setAllRGB(int r, int g, int b) {
   }
 }
 
-
+// Clear all the pixels
+void clear() {
+  setAllGray(0);
+}
 
 
 
