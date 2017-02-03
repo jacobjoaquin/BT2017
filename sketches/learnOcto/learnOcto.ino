@@ -89,7 +89,7 @@ void setFaceColor(int face, int r, int g, int b) {
   } else if (face == 5) {
     setSegment(2, 3, r, g, b);
     setSegment(0, 3, r, g, b);
-    setSegment(1, 1, r, g, b);
+    setSegment(1, 0, r, g, b);
   } else if (face == 6) {
     setSegment(1, 0, r, g, b);
     setSegment(0, 0, r, g, b);
@@ -123,12 +123,11 @@ void setup() {
 
 void loop() {
   clear();
-//  setSegment(0, 0, 255, 48, 0);
-  setFaceColor(5, 128, 32, 0);
+  setFaceColor(7, 128, 32, 0);
   leds.show();
   delay(500);
   clear();
-  setSegment(0, 1, 32, 0, 16);
+  setAllGray(5);
   leds.show();
   delay(500);
 }
