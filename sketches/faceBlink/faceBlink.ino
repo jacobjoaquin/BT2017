@@ -37,13 +37,12 @@
   This test is useful for checking if your LED strips work, and which
   color config (WS2811_RGB, WS2811_GRB, etc) they require.
 
-  Notes:
-  
   ** Important! **
   I've renamed the strip numbers from 1-8 to 0-7. This is more aligned to
   computer programming thinking as the index of the first element in a
   data structure is 0.
 
+  Notes:
   A strip is a square consisting of 456 LEDs
 
   Breakdown of segments:
@@ -94,7 +93,7 @@ void setFaceColor(int face, int r, int g, int b) {
   } else if (face == 5) {
     setSegment(2, 3, r, g, b);
     setSegment(0, 3, r, g, b);
-    setSegment(1, 0, r, g, b);
+    setSegment(1, 1, r, g, b);
   } else if (face == 6) {
     setSegment(1, 0, r, g, b);
     setSegment(0, 0, r, g, b);
@@ -109,8 +108,8 @@ void setFaceColor(int face, int r, int g, int b) {
 #include <OctoWS2811.h>
 
 const int ledsPerStrip = 456;
-const int ledsPerSquare = ledsPerStrip;
-const int nStrips = 4;
+const int nStrips = 3;
+const int nFaces = 8;
 const uint16_t nLeds = ledsPerStrip * nStrips;
 const int ledsPerSegment = 114;
 const uint16_t ledsPerTriangle = 3 * ledsPerSegment;
@@ -122,19 +121,19 @@ const int config = WS2811_GRB | WS2811_800kHz;
 
 OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
 
+// User define variables
+int currentFace = 0;
+
 void setup() {
   leds.begin();
 }
 
 void loop() {
   clear();
-  setFaceColor(7, 128, 32, 0);
+  setFaceColor(currentFace, 255, 0, 128);
   leds.show();
-  delay(500);
-  clear();
-  setAllGray(5);
-  leds.show();
-  delay(500);
+  currentFace = (currentFace + 1) % nFaces;
+  delay(250);
 }
 
 void setSegment(int stripNumber, int segmentNumber, int r, int g, int b) {
@@ -167,7 +166,6 @@ void setAllColor(uint32_t c) {
     leds.setPixel(i, c);
   }
 }
-
 
 // Set all RGB
 void setAllRGB(int r, int g, int b) {
