@@ -40,27 +40,78 @@
 
 
 /*
-R = Strip #0
-G = Strip #1
-B = Strip #2
 
-0 - 113
-114 - 227
-228 - 341
-342 - 455
+  Breakdown of segments
+  segment 0: 0 - 113
+  segment 1: 114 - 227
+  segment 2: 228 - 341
+  segment 3: 342 - 455
+
+
+  //Strips
+  0 = Green
+  1 = Yellow
+  2 = Red
+
+  // Modeled on d8
+  0 r2  g3  y1
+  1 y1- g0  r1
+  2 r1- g1  y2-
+  3 y2  g2  r2-
+
+  4 y3- g2  r3
+  5 r3- g3  y0-
+  6 y0  g0  r0-
+  7 r0  g1  y3
 */
+
+void setFaceColor(int face, int r, int g, int b) {
+  if (face == 0) {
+    setSegment(2, 2, r, g, b);
+    setSegment(0, 3, r, g, b);
+    setSegment(1, 1, r, g, b);
+  } else if (face == 1) {
+    setSegment(1, 1, r, g, b);
+    setSegment(0, 0, r, g, b);
+    setSegment(2, 1, r, g, b);
+  } else if (face == 2) {
+    setSegment(2, 1, r, g, b);
+    setSegment(0, 1, r, g, b);
+    setSegment(1, 2, r, g, b);
+  } else if (face == 3) {
+    setSegment(1, 2, r, g, b);
+    setSegment(0, 2, r, g, b);
+    setSegment(2, 2, r, g, b);
+  } else if (face == 4) {
+    setSegment(1, 3, r, g, b);
+    setSegment(0, 2, r, g, b);
+    setSegment(2, 3, r, g, b);
+  } else if (face == 5) {
+    setSegment(2, 3, r, g, b);
+    setSegment(0, 3, r, g, b);
+    setSegment(1, 1, r, g, b);
+  } else if (face == 6) {
+    setSegment(1, 0, r, g, b);
+    setSegment(0, 0, r, g, b);
+    setSegment(2, 0, r, g, b);
+  } else if (face == 7) {
+    setSegment(2, 0, r, g, b);
+    setSegment(0, 1, r, g, b);
+    setSegment(1, 3, r, g, b);
+  }
+}
 
 #include <OctoWS2811.h>
 
-typedef uint32_t COLOR;
-
 const int ledsPerStrip = 456;
-const int nStrips = 3;
-uint16_t nLeds = ledsPerStrip * nStrips;
-int ledsPerSegment = 114;
+const int ledsPerSquare = ledsPerStrip;
+const int nStrips = 4;
+const uint16_t nLeds = ledsPerStrip * nStrips;
+const int ledsPerSegment = 114;
+const uint16_t ledsPerTriangle = 3 * ledsPerSegment;
 
-DMAMEM int displayMemory[ledsPerStrip*6];
-int drawingMemory[ledsPerStrip*6];
+DMAMEM int displayMemory[ledsPerStrip * 6];
+int drawingMemory[ledsPerStrip * 6];
 
 const int config = WS2811_GRB | WS2811_800kHz;
 
@@ -72,28 +123,28 @@ void setup() {
 
 void loop() {
   clear();
-  setSegment(0, 0, 255, 48, 0);
+//  setSegment(0, 0, 255, 48, 0);
+  setFaceColor(5, 128, 32, 0);
   leds.show();
   delay(500);
   clear();
-  setSegment(0, 1, 255, 0, 128);
+  setSegment(0, 1, 32, 0, 16);
   leds.show();
   delay(500);
 }
-
 
 void setSegment(int stripNumber, int segmentNumber, int r, int g, int b) {
   uint16_t start = stripNumber * ledsPerStrip + segmentNumber * ledsPerSegment;
   uint16_t end = start + ledsPerSegment;
   for (uint16_t i = start; i < end; i++) {
     leds.setPixel(i, (r << 16) | (g << 8) | b);
-  }  
+  }
 }
 
 void setStrip(int stripNumber, int r, int g, int b) {
   uint16_t start = stripNumber * ledsPerStrip;
   uint16_t end = start + ledsPerStrip;
-  
+
   for (uint16_t i = start; i < end; i++) {
     leds.setPixel(i, (r << 16) | (g << 8) | b);
   }
@@ -107,7 +158,7 @@ void setAllGray(int b) {
 }
 
 // Set all color
-void setAllColor(COLOR c) {
+void setAllColor(uint32_t c) {
   for (uint16_t i = 0; i < nLeds; i++) {
     leds.setPixel(i, c);
   }
