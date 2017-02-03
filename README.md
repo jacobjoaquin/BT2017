@@ -1,5 +1,8 @@
 # Bedouin Tech 2017 Presents: Geodesic Temple -CRYPTO-
 
+## Important
+
+I've renumbered the original Teensy Strips from 1-8 to 0-7. This is better aligned to computer programming thinking as the index of the first element in a data structure is 0.
 
 ## Single Unit
 
