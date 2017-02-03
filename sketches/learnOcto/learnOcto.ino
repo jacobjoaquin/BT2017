@@ -70,7 +70,7 @@
   7 r0  g1  y3
 */
 
-void setFaceColor(int face, int r, int g, int b) {
+void setFaceColor(uint8_t face, uint8_t r, uint8_t g, uint8_t b) {
   if (face == 0) {
     setSegment(2, 2, r, g, b);
     setSegment(0, 3, r, g, b);
@@ -111,9 +111,9 @@ void setFaceColor(int face, int r, int g, int b) {
 const int ledsPerStrip = 456;
 const int ledsPerSquare = ledsPerStrip;
 const int nStrips = 4;
-const uint16_t nLeds = ledsPerStrip * nStrips;
+const int nLeds = ledsPerStrip * nStrips;
 const int ledsPerSegment = 114;
-const uint16_t ledsPerTriangle = 3 * ledsPerSegment;
+const int ledsPerTriangle = 3 * ledsPerSegment;
 
 DMAMEM int displayMemory[ledsPerStrip * 6];
 int drawingMemory[ledsPerStrip * 6];
@@ -128,7 +128,8 @@ void setup() {
 
 void loop() {
   clear();
-  setFaceColor(7, 128, 32, 0);
+//  setFaceColor(7, 128, 32, 0);
+  setAllRGB(4, 1, 0);
   leds.show();
   delay(500);
   clear();
@@ -137,41 +138,41 @@ void loop() {
   delay(500);
 }
 
-void setSegment(int stripNumber, int segmentNumber, int r, int g, int b) {
-  uint16_t start = stripNumber * ledsPerStrip + segmentNumber * ledsPerSegment;
-  uint16_t end = start + ledsPerSegment;
-  for (uint16_t i = start; i < end; i++) {
+void setSegment(uint8_t stripNumber, uint8_t segmentNumber, uint8_t r, uint8_t g, uint8_t b) {
+  int start = stripNumber * ledsPerStrip + segmentNumber * ledsPerSegment;
+  int end = start + ledsPerSegment;
+  for (int i = start; i < end; i++) {
     leds.setPixel(i, (r << 16) | (g << 8) | b);
   }
 }
 
-void setStrip(int stripNumber, int r, int g, int b) {
-  uint16_t start = stripNumber * ledsPerStrip;
-  uint16_t end = start + ledsPerStrip;
+void setStrip(uint8_t stripNumber, uint8_t r, uint8_t g, uint8_t b) {
+  int start = stripNumber * ledsPerStrip;
+  int end = start + ledsPerStrip;
 
-  for (uint16_t i = start; i < end; i++) {
+  for (int i = start; i < end; i++) {
     leds.setPixel(i, (r << 16) | (g << 8) | b);
   }
 }
 
 // Set all gray scale
-void setAllGray(int b) {
-  for (uint16_t i = 0; i < nLeds; i++) {
+void setAllGray(uint8_t b) {
+  for (int i = 0; i < nLeds; i++) {
     leds.setPixel(i, (b << 16) | (b << 8) | b);
   }
 }
 
 // Set all color
 void setAllColor(uint32_t c) {
-  for (uint16_t i = 0; i < nLeds; i++) {
+  for (int i = 0; i < nLeds; i++) {
     leds.setPixel(i, c);
   }
 }
 
 
 // Set all RGB
-void setAllRGB(int r, int g, int b) {
-  for (uint16_t i = 0; i < nLeds; i++) {
+void setAllRGB(uint8_t r, uint8_t g, uint8_t b) {
+  for (int i = 0; i < nLeds; i++) {
     leds.setPixel(i, (r << 16) | (g << 8) | b);
   }
 }
