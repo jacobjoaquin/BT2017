@@ -64,9 +64,9 @@ void setup() {
 void loop() {
   for (int i = 0; i < ledsPerFace; i++) {
     clear();
-    setFaceLED(1, i, 128, 0, 32);
+    setFaceLED(2, i, 128, 0, 32);
     leds.show();
-    delay(5);
+    delay(1);
   }
 }
 
@@ -175,8 +175,6 @@ void setFaceLED(uint8_t face, int index, uint8_t r, uint8_t g, uint8_t b) {
       i = 1 * ledsPerStrip + ((1 + 1) * ledsPerBeam - 1) - index;
     }
   } else if (face == 1) {
-
-
     if (index < ledsPerBeam) {
       i = 0 * ledsPerStrip + 0 * ledsPerBeam + index;
     } else if (index < 2 * ledsPerBeam) {
@@ -184,8 +182,30 @@ void setFaceLED(uint8_t face, int index, uint8_t r, uint8_t g, uint8_t b) {
     } else {
       i = 2 * ledsPerStrip + (1 * ledsPerBeam - 1) - (index - 2 * ledsPerBeam);
     }
+  } else if (face == 2) {
+    if (index < ledsPerBeam) {
+      i = faceIndexToDisplayIndex(index, 0, 0, 0, true);
+    } else if (index < 2 * ledsPerBeam) {
+      i = faceIndexToDisplayIndex(index, 1, 0, 1, true);
+    } else {
+      i = faceIndexToDisplayIndex(index, 2, 0, 2, true);
+    }
   }
 
   leds.setPixel(i, (r << 16) | (g << 8) | b);
 }
+
+/*
+ * index: LED position in traingle. [0, ledsPerFace)
+ * strip: Square index. g = 0, y = 1, r = 2
+ * beam: Beam index in square. [0, 4)
+ * traingle: traingle beam index. [0, 3)
+ * isReverse: Determines the direction of flow
+ */
+int faceIndexToDisplayIndex(int index, uint8_t strip, uint8_t beam, uint8_t triangle, boolean isReverse) {
+  index -= triangle * ledsPerBeam;
+  index *= isReverse ? 1 : -1;
+  return strip * ledsPerStrip + ((beam + isReverse) * ledsPerBeam - isReverse) + index;
+}
+
 
