@@ -34,18 +34,20 @@ I've renumbered the original Teensy Strips from 1-8 to 0-7. This is better align
 - A face is a triangle consisting of 3 beams
 - The layout of faces are modeled after an 8-sided die.
 - The minus symbol (-) indicates the LEDs flow in the reverse direction.
-- A beam is described in the format `xn(-)`, where x is rgb for the beam color, n is the beam index, and a `-` to indicate flow is reversed.
-  - i.e. `y0 g0 r0-`:
-    - yellow beam 0, green beam 0, red beam 0 (reverse)
-    - strip 1 beam 0, strip 0 beam 0, strip 2 beam (reverse)
+- A beam is described in the format `[(-)sn, (-)sn, (-)sn]`
+  - -: If present, this indicates the flow is reversed
+  - s: Which strip, denoted by rgb
+  - n: The beam index of the strip
+- i.e. `[r2, g3, -y1]`:
+  - strip 2 beam 2 -> strip 0 beam 3 -> strip 1 beam 1 (reverse)
 
-#### Layout for each
+#### Layout for each face
 
-- face 0: `r2  g3  y1`
-- face 1: `y1- g0  r1`
-- face 2: `r1- g1  y2-`
-- face 3: `y2  g2  r2-`
-- face 4: `y3- g2  r3`
-- face 5: `r3- g3  y0-`
-- face 6: `y0  g0  r0-`
-- face 7: `r0  g1  y3`
+- face 0: `[r2, g3, -y1]`
+- face 1: `[-y1, g0, r1]`
+- face 2: `[-r1, g1, -y2]`
+- face 3: `[y2, g2, -r2]`
+- face 4: `[-y3, g2, r3]`
+- face 5: `[-r3, g3, -y0]`
+- face 6: `[y0, g0, -r0]`
+- face 7: `[r0, g1, y3]`
