@@ -40,6 +40,8 @@
 
 #include <OctoWS2811.h>
 
+#define color(R, G, B)  ( ( R << 16 ) | ( G << 8 ) | B )
+
 const int ledsPerStrip = 456;
 const int nStrips = 3;
 const int nFaces = 8;
@@ -64,19 +66,18 @@ void setup() {
 void loop() {
   for (int i = 0; i < ledsPerFace; i++) {
     clear();
-    setFaceLED(2, i, 128, 0, 32);
+    setFaceLED(currentFace, i, 255, 0, 128);
     leds.show();
-    delay(1);
+    delay(1000 / 120);  // Attempting 120 frames per second
   }
+  currentFace = (currentFace + 1) % nFaces;
 }
-
-
 
 void setBeam(uint8_t stripNumber, uint8_t beamNumber, uint8_t r, uint8_t g, uint8_t b) {
   int start = stripNumber * ledsPerStrip + beamNumber * ledsPerBeam;
   int end = start + ledsPerBeam;
   for (int i = start; i < end; i++) {
-    leds.setPixel(i, (r << 16) | (g << 8) | b);
+    leds.setPixel(i, color(r, g, b));
   }
 }
 
@@ -85,14 +86,14 @@ void setStrip(uint8_t stripNumber, uint8_t r, uint8_t g, uint8_t b) {
   int end = start + ledsPerStrip;
 
   for (int i = start; i < end; i++) {
-    leds.setPixel(i, (r << 16) | (g << 8) | b);
+    leds.setPixel(i, color(r, g, b));
   }
 }
 
 // Set all gray scale
 void setAllGray(uint8_t b) {
   for (int i = 0; i < nLeds; i++) {
-    leds.setPixel(i, (b << 16) | (b << 8) | b);
+    leds.setPixel(i, color(b, b, b));
   }
 }
 
@@ -107,7 +108,7 @@ void setAllColor(uint32_t c) {
 // Set all RGB
 void setAllRGB(uint8_t r, uint8_t g, uint8_t b) {
   for (int i = 0; i < nLeds; i++) {
-    leds.setPixel(i, (r << 16) | (g << 8) | b);
+    leds.setPixel(i, color(r, g, b));
   }
 }
 
@@ -153,58 +154,113 @@ void setFaceColor(uint8_t face, uint8_t r, uint8_t g, uint8_t b) {
   }
 }
 
-void setFaceLED(uint8_t face, int index, uint8_t r, uint8_t g, uint8_t b) {
-  /*
-    - face 0: `[r2, g3, -y1]`
-    - face 1: `[-y1, g0, r1]`
-    - face 2: `[-r1, g1, -y2]`
-    - face 3: `[y2, g2, -r2]`
-    - face 4: `[-y3, g2, r3]`
-    - face 5: `[-r3, g3, -y0]`
-    - face 6: `[y0, g0, -r0]`
-    - face 7: `[r0, g1, y3]`
-  */
-
+/*
+   face: Index of face. [0-7]  (use -1 for DEBUG)
+   index: index of LED in face. [0-ledsPerFace)
+   r: red [0-255]
+   g: green [0-255]
+   b: blue [0-255]
+*/
+void setFaceLED(int face, int index, uint8_t r, uint8_t g, uint8_t b) {
   int i = 0;
   if (face == 0) {
+    // [r2, g3, -y1]
     if (index < ledsPerBeam) {
-      i = 2 * ledsPerStrip + 2 * ledsPerBeam + index;
+      i = faceIndexToDisplayIndex(index, 2, 2, 0, false);
     } else if (index < 2 * ledsPerBeam) {
-      i = 0 * ledsPerStrip + 3 * ledsPerBeam + index;
+      i = faceIndexToDisplayIndex(index, 0, 3, 1, false);
     } else {
-      i = 1 * ledsPerStrip + ((1 + 1) * ledsPerBeam - 1) - index;
+      i = faceIndexToDisplayIndex(index, 1, 1, 2, true);
     }
   } else if (face == 1) {
+    // [-y1, g0, r1]
     if (index < ledsPerBeam) {
-      i = 0 * ledsPerStrip + 0 * ledsPerBeam + index;
+      i = faceIndexToDisplayIndex(index, 1, 1, 0, true);
     } else if (index < 2 * ledsPerBeam) {
-      i = 1 * ledsPerStrip + 0 * ledsPerBeam + index - 1 * ledsPerBeam;
+      i = faceIndexToDisplayIndex(index, 0, 0, 1, false);
     } else {
-      i = 2 * ledsPerStrip + (1 * ledsPerBeam - 1) - (index - 2 * ledsPerBeam);
+      i = faceIndexToDisplayIndex(index, 2, 1, 2, false);
     }
   } else if (face == 2) {
+    // [-r1, g1, -y2]
     if (index < ledsPerBeam) {
-      i = faceIndexToDisplayIndex(index, 0, 0, 0, true);
+      i = faceIndexToDisplayIndex(index, 2, 1, 0, true);
     } else if (index < 2 * ledsPerBeam) {
-      i = faceIndexToDisplayIndex(index, 1, 0, 1, true);
+      i = faceIndexToDisplayIndex(index, 0, 1, 1, false);
+    } else {
+      i = faceIndexToDisplayIndex(index, 1, 2, 2, true);
+    }
+  } else if (face == 3) {
+    // [y2, g2, -r2]
+    if (index < ledsPerBeam) {
+      i = faceIndexToDisplayIndex(index, 1, 2, 0, false);
+    } else if (index < 2 * ledsPerBeam) {
+      i = faceIndexToDisplayIndex(index, 0, 2, 1, false);
+    } else {
+      i = faceIndexToDisplayIndex(index, 2, 2, 2, true);
+    }
+  } else if (face == 4) {
+    // [-y3, g2, r3]
+    if (index < ledsPerBeam) {
+      i = faceIndexToDisplayIndex(index, 1, 3, 0, true);
+    } else if (index < 2 * ledsPerBeam) {
+      i = faceIndexToDisplayIndex(index, 0, 2, 1, false);
+    } else {
+      i = faceIndexToDisplayIndex(index, 2, 3, 2, false);
+    }
+  } else if (face == 5) {
+    // [-r3, g3, -y0]
+    if (index < ledsPerBeam) {
+      i = faceIndexToDisplayIndex(index, 2, 3, 0, true);
+    } else if (index < 2 * ledsPerBeam) {
+      i = faceIndexToDisplayIndex(index, 0, 3, 1, false);
+    } else {
+      i = faceIndexToDisplayIndex(index, 1, 0, 2, true);
+    }
+  } else if (face == 6) {
+    // [y0, g0, -r0]
+    if (index < ledsPerBeam) {
+      i = faceIndexToDisplayIndex(index, 1, 0, 0, false);
+    } else if (index < 2 * ledsPerBeam) {
+      i = faceIndexToDisplayIndex(index, 0, 0, 1, false);
     } else {
       i = faceIndexToDisplayIndex(index, 2, 0, 2, true);
     }
+  } else if (face == 7) {
+    //     [r0, g1, y3]
+    if (index < ledsPerBeam) {
+      i = faceIndexToDisplayIndex(index, 2, 0, 0, false);
+    } else if (index < 2 * ledsPerBeam) {
+      i = faceIndexToDisplayIndex(index, 0, 1, 1, false);
+    } else {
+      i = faceIndexToDisplayIndex(index, 1, 3, 2, false);
+    }
+
+  } else if (face == -1) {
+    // DEBUG
+    if (index < ledsPerBeam) {
+      i = faceIndexToDisplayIndex(index, 0, 1, 0, true);
+      //      i = index;
+    } else if (index < 2 * ledsPerBeam) {
+      i = faceIndexToDisplayIndex(index, 1, 1, 1, true);
+    } else {
+      i = faceIndexToDisplayIndex(index, 2, 1, 2, true);
+    }
   }
 
-  leds.setPixel(i, (r << 16) | (g << 8) | b);
+  leds.setPixel(i, color(r, g, b));
 }
 
 /*
- * index: LED position in traingle. [0, ledsPerFace)
- * strip: Square index. g = 0, y = 1, r = 2
- * beam: Beam index in square. [0, 4)
- * traingle: traingle beam index. [0, 3)
- * isReverse: Determines the direction of flow
- */
-int faceIndexToDisplayIndex(int index, uint8_t strip, uint8_t beam, uint8_t triangle, boolean isReverse) {
+   index: LED position in traingle. [0, ledsPerFace)
+   strip: Square index. g = 0, y = 1, r = 2
+   beam: Beam index in square. [0, 4)
+   traingle: traingle beam index. [0, 3)
+   isReverse: Determines the direction of flow
+*/
+int faceIndexToDisplayIndex(int index, int strip, int beam, int triangle, boolean isReverse) {
   index -= triangle * ledsPerBeam;
-  index *= isReverse ? 1 : -1;
+  index *= 1 - isReverse * 2;
   return strip * ledsPerStrip + ((beam + isReverse) * ledsPerBeam - isReverse) + index;
 }
 
