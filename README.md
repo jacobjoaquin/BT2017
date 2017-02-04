@@ -36,8 +36,8 @@ I've renumbered the original Teensy Strips from 1-8 to 0-7. This is better align
 - The minus symbol (-) indicates the LEDs flow in the reverse direction.
 - A beam is described in the format `[(-)sn, (-)sn, (-)sn]`
   - -: If present, this indicates the flow is reversed
-  - s: Which strip, denoted by rgb
-  - n: The beam index of the strip
+  - s: Which strip index, denoted by rgb
+  - n: The beam index
 - i.e. `[r2, g3, -y1]`:
   - strip 2 beam 2 -> strip 0 beam 3 -> strip 1 beam 1 (reverse)
 
