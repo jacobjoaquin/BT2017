@@ -45,7 +45,7 @@ const int nStrips = 3;
 const int nFaces = 8;
 const int nLeds = ledsPerStrip * nStrips;
 const int ledsPerBeam = 114;
-const int ledsPerTriangle = 3 * ledsPerBeam;
+const int ledsPerFace = 3 * ledsPerBeam;
 
 DMAMEM int displayMemory[ledsPerStrip * 6];
 int drawingMemory[ledsPerStrip * 6];
@@ -62,9 +62,9 @@ void setup() {
 }
 
 void loop() {
-  for (int i = 0; i < ledsPerTriangle; i++) {
+  for (int i = 0; i < ledsPerFace; i++) {
     clear();
-    setFaceLED(0, i, 128, 0, 32);
+    setFaceLED(1, i, 128, 0, 32);
     leds.show();
     delay(5);
   }
@@ -174,9 +174,18 @@ void setFaceLED(uint8_t face, int index, uint8_t r, uint8_t g, uint8_t b) {
     } else {
       i = 1 * ledsPerStrip + ((1 + 1) * ledsPerBeam - 1) - index;
     }
+  } else if (face == 1) {
+
+
+    if (index < ledsPerBeam) {
+      i = 0 * ledsPerStrip + 0 * ledsPerBeam + index;
+    } else if (index < 2 * ledsPerBeam) {
+      i = 1 * ledsPerStrip + 0 * ledsPerBeam + index - 1 * ledsPerBeam;
+    } else {
+      i = 2 * ledsPerStrip + (1 * ledsPerBeam - 1) - (index - 2 * ledsPerBeam);
+    }
   }
 
   leds.setPixel(i, (r << 16) | (g << 8) | b);
 }
-
 
