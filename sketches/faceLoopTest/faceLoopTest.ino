@@ -40,7 +40,8 @@
 
 #include <OctoWS2811.h>
 
-#define color(R, G, B)  ( ( R << 16 ) | ( G << 8 ) | B )
+// Combines red, green, blue into a single value
+#define rgb(R, G, B)  ( ( R << 16 ) | ( G << 8 ) | B )
 
 const int ledsPerStrip = 456;
 const int nStrips = 3;
@@ -64,93 +65,20 @@ void setup() {
 }
 
 void loop() {
+  // Cycle through each LED in each face
   for (int i = 0; i < ledsPerFace; i++) {
     clear();
-    setFaceLED(currentFace, i, 255, 0, 128);
+    setFaceLED(currentFace, i, rgb(255, 0, 128));
     leds.show();
     delay(1000 / 120);  // Attempting 120 frames per second
   }
   currentFace = (currentFace + 1) % nFaces;
 }
 
-void setBeam(uint8_t stripNumber, uint8_t beamNumber, uint8_t r, uint8_t g, uint8_t b) {
-  int start = stripNumber * ledsPerStrip + beamNumber * ledsPerBeam;
-  int end = start + ledsPerBeam;
-  for (int i = start; i < end; i++) {
-    leds.setPixel(i, color(r, g, b));
-  }
-}
-
-void setStrip(uint8_t stripNumber, uint8_t r, uint8_t g, uint8_t b) {
-  int start = stripNumber * ledsPerStrip;
-  int end = start + ledsPerStrip;
-
-  for (int i = start; i < end; i++) {
-    leds.setPixel(i, color(r, g, b));
-  }
-}
-
-// Set all gray scale
-void setAllGray(uint8_t b) {
-  for (int i = 0; i < nLeds; i++) {
-    leds.setPixel(i, color(b, b, b));
-  }
-}
-
-// Set all color
-void setAllColor(uint32_t c) {
-  for (int i = 0; i < nLeds; i++) {
-    leds.setPixel(i, c);
-  }
-}
-
-
-// Set all RGB
-void setAllRGB(uint8_t r, uint8_t g, uint8_t b) {
-  for (int i = 0; i < nLeds; i++) {
-    leds.setPixel(i, color(r, g, b));
-  }
-}
-
 // Clear all the pixels
 void clear() {
-  setAllGray(0);
-}
-
-// Set a face
-void setFaceColor(uint8_t face, uint8_t r, uint8_t g, uint8_t b) {
-  if (face == 0) {
-    setBeam(2, 2, r, g, b);
-    setBeam(0, 3, r, g, b);
-    setBeam(1, 1, r, g, b);
-  } else if (face == 1) {
-    setBeam(1, 1, r, g, b);
-    setBeam(0, 0, r, g, b);
-    setBeam(2, 1, r, g, b);
-  } else if (face == 2) {
-    setBeam(2, 1, r, g, b);
-    setBeam(0, 1, r, g, b);
-    setBeam(1, 2, r, g, b);
-  } else if (face == 3) {
-    setBeam(1, 2, r, g, b);
-    setBeam(0, 2, r, g, b);
-    setBeam(2, 2, r, g, b);
-  } else if (face == 4) {
-    setBeam(1, 3, r, g, b);
-    setBeam(0, 2, r, g, b);
-    setBeam(2, 3, r, g, b);
-  } else if (face == 5) {
-    setBeam(2, 3, r, g, b);
-    setBeam(0, 3, r, g, b);
-    setBeam(1, 1, r, g, b);
-  } else if (face == 6) {
-    setBeam(1, 0, r, g, b);
-    setBeam(0, 0, r, g, b);
-    setBeam(2, 0, r, g, b);
-  } else if (face == 7) {
-    setBeam(2, 0, r, g, b);
-    setBeam(0, 1, r, g, b);
-    setBeam(1, 3, r, g, b);
+  for (int i = 0; i < nLeds; i++) {
+    leds.setPixel(i, 0);
   }
 }
 
@@ -161,7 +89,7 @@ void setFaceColor(uint8_t face, uint8_t r, uint8_t g, uint8_t b) {
    g: green [0-255]
    b: blue [0-255]
 */
-void setFaceLED(int face, int index, uint8_t r, uint8_t g, uint8_t b) {
+void setFaceLED(int face, int index, uint32_t color) {
   int i = 0;
   if (face == 0) {
     // [r2, g3, -y1]
@@ -248,7 +176,7 @@ void setFaceLED(int face, int index, uint8_t r, uint8_t g, uint8_t b) {
     }
   }
 
-  leds.setPixel(i, color(r, g, b));
+  leds.setPixel(i, color);
 }
 
 /*
@@ -264,4 +192,6 @@ int faceIndexToDisplayIndex(int index, int strip, int beam, int triangle, boolea
   return strip * ledsPerStrip + ((beam + isReverse) * ledsPerBeam - isReverse) + index;
 }
 
-
+int foo(int face, int index) {
+  return table[face * ledsPerFace + index];
+}
