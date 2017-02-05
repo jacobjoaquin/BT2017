@@ -192,6 +192,3 @@ int faceIndexToDisplayIndex(int index, int strip, int beam, int triangle, boolea
   return strip * ledsPerStrip + ((beam + isReverse) * ledsPerBeam - isReverse) + index;
 }
 
-int foo(int face, int index) {
-  return table[face * ledsPerFace + index];
-}
