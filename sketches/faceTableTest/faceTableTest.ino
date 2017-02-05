@@ -60,7 +60,7 @@ const int config = WS2811_GRB | WS2811_800kHz;
 
 OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
 
-// User define variables
+// User defined variables
 int currentFace = 0;
 
 void setup() {
@@ -71,7 +71,6 @@ void loop() {
   // Cycle through each LED in each face
   for (int i = 0; i < ledsPerFace; i++) {
     clear();
-    //    leds.setPixel(getFaceIndex(currentFace, i), rgb(255, 0, 128));
     setFaceLED(currentFace, i, rgb(255, 0, 128));
     leds.show();
     delay(1000 / 120);  // Attempting 120 frames per second
