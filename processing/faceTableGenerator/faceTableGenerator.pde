@@ -10,6 +10,7 @@ int nFaces = 8;
 int nLeds = ledsPerStrip * nStrips;
 int ledsPerBeam = 114;
 int ledsPerFace = 3 * ledsPerBeam;
+String fileName = "output.txt";
 
 int setFaceLED(int face, int index) {
         int i = 0;
@@ -121,7 +122,7 @@ void setup() {
         list.append("};\n");
 
         try {
-                FileWriter writer = new FileWriter("/Users/jacobjoaquin/Documents/Projects/BT2017/BT2017/processing/faceTableGenerator/output.txt");
+                FileWriter writer = new FileWriter(sketchPath("") + fileName);
                 PrintWriter printWriter = new PrintWriter(writer);
 
                 printWriter.print(list.toString());
