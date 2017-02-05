@@ -49,6 +49,7 @@ const int nFaces = 8;
 const int nLeds = ledsPerStrip * nStrips;
 const int ledsPerBeam = 114;
 const int ledsPerFace = 3 * ledsPerBeam;
+const int frameDelay = 1000 / 120;
 
 // Octows2811 Setup
 DMAMEM int displayMemory[ledsPerStrip * 6];
@@ -57,19 +58,17 @@ const int config = WS2811_GRB | WS2811_800kHz;
 OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
 
 // User defined variables
+
+// Colors
 uint32_t orange = rgb(255, 64, 0);
 uint32_t magenta = rgb(255, 0, 128);
 uint32_t black = rgb(0, 0, 0);
 uint32_t white = rgb(255, 255, 255);
 
-// Set colors here
+// Set head and tail colors
 uint32_t tailColor = orange;
 uint32_t headColor = magenta;
 
-const int frameDelay = 1000 / 120;
-int currentFace = 0;
-const int halfBeamBufferLength = ledsPerBeam / 2;
-uint32_t halfBeamBuffer[halfBeamBufferLength];
 int pos = 0;
 int tail = ledsPerBeam / 4;
 int head = ledsPerBeam / 8;
@@ -80,9 +79,6 @@ void setup() {
 
 void loop() {
   clear();
-
-  // Update singleBeamBuffer
-  memset(halfBeamBuffer, 0, sizeof halfBeamBuffer); // Zero-out buffer
 
   for (int i = 0; i < tail; i++) {
     uint32_t thisColor = 0;
@@ -97,8 +93,8 @@ void loop() {
     }
 
     int thisPos = i + pos;
-    int forwardIndex = (thisPos) % halfBeamBufferLength;
-    int reverseIndex = ledsPerBeam - 1 - ((thisPos) % halfBeamBufferLength);
+    int forwardIndex = thisPos % (ledsPerBeam / 2);
+    int reverseIndex = ledsPerBeam - 1 - (thisPos % (ledsPerBeam / 2));
 
     for (int j = 0; j < nStrips * 4; j++) {
       int beamOffset = j * ledsPerBeam;
@@ -106,10 +102,9 @@ void loop() {
       leds.setPixel(reverseIndex + beamOffset, thisColor);
     }
   }
-  pos = (pos + 1) % halfBeamBufferLength;
+  pos = (pos + 1) % (ledsPerBeam / 2);
   leds.show();
   delay(frameDelay);
-
 }
 
 // Clear all the pixels
