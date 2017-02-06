@@ -47,7 +47,7 @@ const int ledsPerStrip = 456;
 const int nStrips = 3;
 const int nFaces = 8;
 const int nLeds = ledsPerStrip * nStrips;
-const int ledsPerBeam = 114;
+const int ledsPerBeam = ledsPerStrip / 4;
 const int ledsPerFace = 3 * ledsPerBeam;
 const int frameDelay = 1000 / 120;
 const int ledsPerHalfBeam = ledsPerBeam / 2;
@@ -80,7 +80,7 @@ void loop() {
   clear();
 
   for (int i = 0; i < tail; i++) {
-    uint32_t thisColor = 0;
+    uint32_t thisColor;
 
     // Head
     if (i > tail - head) {
@@ -91,9 +91,8 @@ void loop() {
       thisColor = lerpColor(black, tailColor, (float) i / (float) (tail - head));
     }
 
-    int thisPos = i + pos;
-    int forwardIndex = thisPos % ledsPerHalfBeam;
-    int reverseIndex = ledsPerBeam - 1 - (thisPos % ledsPerHalfBeam);
+    int forwardIndex = (i + pos) % ledsPerHalfBeam;
+    int reverseIndex = ledsPerBeam - 1 - forwardIndex;
 
     for (int j = 0; j < nBeams; j++) {
       int beamOffset = j * ledsPerBeam;
@@ -115,6 +114,7 @@ void clear() {
 
 // Interpolate between two colors.
 uint32_t lerpColor(uint32_t c1, uint32_t c2, float amt) {
+  int i = (int) (amt * 256.0);
   uint32_t r1 = (c1 & 0xff0000) >> 16;
   uint32_t g1 = (c1 & 0xff00) >> 8;
   uint32_t b1 = (c1 & 0xff);
@@ -122,9 +122,10 @@ uint32_t lerpColor(uint32_t c1, uint32_t c2, float amt) {
   uint32_t g2 = (c2 & 0xff00) >> 8;
   uint32_t b2 = (c2 & 0xff);
 
-  float r = (float(r1) * (1.0 - amt) + float(r2) * amt) / 2.0;
-  float g = (float(g1) * (1.0 - amt) + float(g2) * amt) / 2.0;
-  float b = (float(b1) * (1.0 - amt) + float(b2) * amt) / 2.0;
+  uint32_t r = ((r2 * i) + (r1  * (256 - i))) >> 8;
+  uint32_t g = ((g2 * i) + (g1  * (256 - i))) >> 8;
+  uint32_t b = ((b2 * i) + (b1  * (256 - i))) >> 8;
 
-  return (uint32_t(r) << 16) | (uint32_t(g) << 8) | uint32_t(b);
+  return rgb(r, g, b);
 }
+
