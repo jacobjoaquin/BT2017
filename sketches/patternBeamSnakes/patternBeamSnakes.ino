@@ -33,14 +33,10 @@
 */
 
 #include <OctoWS2811.h>
+#include "gamma8.h"
 
-// Macro Functions
 // Convert rbg values to single value
-#define rgb(R, G, B)       ( ( R << 16 ) | ( G << 8 ) | B )
-// Get the display index from face and face index
-#define getFaceIndex(F, I)  ( faceTable[ F * ledsPerFace + I ] )
-// Set a face LED
-#define setFaceLED(F, I, C) ( leds.setPixel( faceTable[ F * ledsPerFace + I ], C ) )
+#define rgb(R, G, B)  ( ( pgm_read_byte( &gamma8[ ( R ) ] ) << 16 ) | ( pgm_read_byte( &gamma8[ ( G ) ] ) << 8 ) | pgm_read_byte( &gamma8[ ( B )] ) )
 
 // Constansts
 const int ledsPerStrip = 456;
@@ -60,8 +56,8 @@ const int config = WS2811_GRB | WS2811_800kHz;
 OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
 
 // User defined variables
-uint32_t orange = rgb(255, 64, 0);
-uint32_t magenta = rgb(255, 0, 128);
+uint32_t orange = rgb(255, 212, 0);
+uint32_t magenta = rgb(255, 0, 255);
 uint32_t black = rgb(0, 0, 0);
 uint32_t white = rgb(255, 255, 255);
 int pos = 0;
@@ -115,17 +111,16 @@ void clear() {
 // Interpolate between two colors.
 uint32_t lerpColor(uint32_t c1, uint32_t c2, float amt) {
   int i = (int) (amt * 256.0);
+  int di = 256 - i;
   uint32_t r1 = (c1 & 0xff0000) >> 16;
   uint32_t g1 = (c1 & 0xff00) >> 8;
   uint32_t b1 = (c1 & 0xff);
   uint32_t r2 = (c2 & 0xff0000) >> 16;
   uint32_t g2 = (c2 & 0xff00) >> 8;
   uint32_t b2 = (c2 & 0xff);
-
-  uint32_t r = ((r2 * i) + (r1  * (256 - i))) >> 8;
-  uint32_t g = ((g2 * i) + (g1  * (256 - i))) >> 8;
-  uint32_t b = ((b2 * i) + (b1  * (256 - i))) >> 8;
-
+  uint8_t r = ((r2 * i) + (r1 * di)) >> 8;
+  uint8_t g = ((g2 * i) + (g1 * di)) >> 8;
+  uint8_t b = ((b2 * i) + (b1 * di)) >> 8;
   return rgb(r, g, b);
 }
 
