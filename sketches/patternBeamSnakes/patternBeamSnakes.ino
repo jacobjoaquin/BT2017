@@ -33,10 +33,11 @@
 */
 
 #include <OctoWS2811.h>
-#include "gamma8.h"
+//#include "gamma8.h"
 
 // Convert rbg values to single value
-#define rgb(R, G, B)  ( ( pgm_read_byte( &gamma8[ ( R ) ] ) << 16 ) | ( pgm_read_byte( &gamma8[ ( G ) ] ) << 8 ) | pgm_read_byte( &gamma8[ ( B )] ) )
+//#define rgb(R, G, B)  ( ( pgm_read_byte( &gamma8[ ( R ) ] ) << 16 ) | ( pgm_read_byte( &gamma8[ ( G ) ] ) << 8 ) | pgm_read_byte( &gamma8[ ( B )] ) )
+#define rgb(R, G, B)  ( ( ( R ) << 16 ) | ( ( G ) << 8 ) | ( B ) )
 
 // Constansts
 const int ledsPerStrip = 456;
@@ -45,7 +46,7 @@ const int nFaces = 8;
 const int nLeds = ledsPerStrip * nStrips;
 const int ledsPerBeam = ledsPerStrip / 4;
 const int ledsPerFace = 3 * ledsPerBeam;
-const int frameDelay = 1000 / 120;
+const int frameDelay = 1000 / 60;
 const int ledsPerHalfBeam = ledsPerBeam / 2;
 const int nBeams = nStrips * 4;
 
@@ -56,8 +57,8 @@ const int config = WS2811_GRB | WS2811_800kHz;
 OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
 
 // User defined variables
-uint32_t orange = rgb(255, 212, 0);
-uint32_t magenta = rgb(255, 0, 255);
+uint32_t orange = rgb(255, 64, 0);
+uint32_t magenta = rgb(255, 0, 192);
 uint32_t black = rgb(0, 0, 0);
 uint32_t white = rgb(255, 255, 255);
 int pos = 0;
@@ -66,7 +67,7 @@ int pos = 0;
 uint32_t tailColor = orange;
 uint32_t headColor = magenta;
 int tail = ledsPerBeam / 4;
-int head = ledsPerBeam / 8;
+int head = ledsPerBeam / 12;
 
 void setup() {
   leds.begin();
