@@ -47,7 +47,7 @@ const int ledsPerStrip = 456;
 const int nStrips = 3;
 const int nFaces = 8;
 const int nLeds = ledsPerStrip * nStrips;
-const int ledsPerBeam = 114;
+const int ledsPerBeam = ledsPerStrip / 4;
 const int ledsPerFace = 3 * ledsPerBeam;
 const int frameDelay = 1000 / 120;
 const int ledsPerHalfBeam = ledsPerBeam / 2;
@@ -80,7 +80,7 @@ void loop() {
   clear();
 
   for (int i = 0; i < tail; i++) {
-    uint32_t thisColor = 0;
+    uint32_t thisColor;
 
     // Head
     if (i > tail - head) {
@@ -91,9 +91,8 @@ void loop() {
       thisColor = lerpColor(black, tailColor, (float) i / (float) (tail - head));
     }
 
-    int thisPos = i + pos;
-    int forwardIndex = thisPos % ledsPerHalfBeam;
-    int reverseIndex = ledsPerBeam - 1 - (thisPos % ledsPerHalfBeam);
+    int forwardIndex = (i + pos) % ledsPerHalfBeam;
+    int reverseIndex = ledsPerBeam - 1 - forwardIndex;
 
     for (int j = 0; j < nBeams; j++) {
       int beamOffset = j * ledsPerBeam;
