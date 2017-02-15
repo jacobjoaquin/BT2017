@@ -35,9 +35,8 @@
 #include <OctoWS2811.h>
 //#include "gamma8.h"
 
-// Convert rbg values to single value
-//#define rgb(R, G, B)  ( ( pgm_read_byte( &gamma8[ ( R ) ] ) << 16 ) | ( pgm_read_byte( &gamma8[ ( G ) ] ) << 8 ) | pgm_read_byte( &gamma8[ ( B )] ) )
-#define rgb(R, G, B)  ( ( ( R ) << 16 ) | ( ( G ) << 8 ) | ( B ) )
+// Combine rbg values to color
+#define rgb(R, G, B)  (((R) << 16) | ((G) << 8) | (B))
 
 // Constansts
 const int ledsPerStrip = 456;
@@ -46,7 +45,7 @@ const int nFaces = 8;
 const int nLeds = ledsPerStrip * nStrips;
 const int ledsPerBeam = ledsPerStrip / 4;
 const int ledsPerFace = 3 * ledsPerBeam;
-const int frameDelay = 1000 / 60;
+const int frameDelay = 1000 / 120;
 const int ledsPerHalfBeam = ledsPerBeam / 2;
 const int nBeams = nStrips * 4;
 
@@ -114,15 +113,13 @@ uint32_t lerpColor(uint32_t c1, uint32_t c2, float amt) {
   int i = (int) (amt * 256.0) + 1;
   int di = 256 - i;
   uint32_t r1 = (c1 & 0xff0000) >> 16;
-  uint32_t g1 = (c1 & 0xff00) >> 8;
-  uint32_t b1 = (c1 & 0xff);
+  uint32_t g1 = (c1 & 0x00ff00) >> 8;
+  uint32_t b1 = (c1 & 0x0000ff);
   uint32_t r2 = (c2 & 0xff0000) >> 16;
-  uint32_t g2 = (c2 & 0xff00) >> 8;
-  uint32_t b2 = (c2 & 0xff);
+  uint32_t g2 = (c2 & 0x00ff00) >> 8;
+  uint32_t b2 = (c2 & 0x0000ff);
   uint8_t r = ((r2 * i) + (r1 * di)) >> 8;
   uint8_t g = ((g2 * i) + (g1 * di)) >> 8;
   uint8_t b = ((b2 * i) + (b1 * di)) >> 8;
-  return rgb(r, g, b);
+  return (r << 16) | (g << 8) | b;
 }
-
-
