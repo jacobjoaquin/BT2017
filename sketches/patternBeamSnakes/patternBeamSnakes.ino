@@ -111,7 +111,7 @@ void clear() {
 
 // Interpolate between two colors.
 uint32_t lerpColor(uint32_t c1, uint32_t c2, float amt) {
-  int i = (int) (amt * 256.0);
+  int i = (int) (amt * 256.0) + 1;
   int di = 256 - i;
   uint32_t r1 = (c1 & 0xff0000) >> 16;
   uint32_t g1 = (c1 & 0xff00) >> 8;
@@ -124,4 +124,5 @@ uint32_t lerpColor(uint32_t c1, uint32_t c2, float amt) {
   uint8_t b = ((b2 * i) + (b1 * di)) >> 8;
   return rgb(r, g, b);
 }
+
 
