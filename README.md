@@ -50,4 +50,4 @@ I've renumbered the original Teensy Strips from 1-8 to 0-7. This is better align
 - face 4: `[r1-, g1, y2-]`
 - face 5: `[y1, g2, r2-]`
 - face 6: `[r2, g3, y1]`
-- face 7: `[face == 7]`
+- face 7: `[y1-, g0, r1]`
