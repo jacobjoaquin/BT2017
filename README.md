@@ -6,7 +6,7 @@ I've renumbered the original Teensy Strips from 1-8 to 0-7. This is better align
 
 ## Single Unit
 
-![Single Unit](./assets/singleUnitLayout.png)
+![Single Unit](./assets/layoutWithBeamIndices.png)
 
 ### Strip Layout
 
@@ -34,20 +34,20 @@ I've renumbered the original Teensy Strips from 1-8 to 0-7. This is better align
 - A face is a triangle consisting of 3 beams
 - The layout of faces are modeled after an 8-sided die.
 - The minus symbol (-) indicates the LEDs flow in the reverse direction.
-- A beam is described in the format `[(-)sn, (-)sn, (-)sn]`
-  - -: If present, this indicates the flow is reversed
+- A beam is described in the format `[sn(-), sn(-), sn(-)]`
   - s: Which strip index, denoted by rgb
   - n: The beam index
-- i.e. `[r2, g3, -y1]`:
+  - -: If present, this indicates the flow is reversed
+- i.e. `[r2, g3, y1-]`:
   - strip 2 beam 2 -> strip 0 beam 3 -> strip 1 beam 1 (reverse)
 
 #### Layout for each face
 
-- face 0: `[r2, g3, -y1]`
-- face 1: `[-y1, g0, r1]`
-- face 2: `[-r1, g1, -y2]`
-- face 3: `[y2, g2, -r2]`
-- face 4: `[-y3, g2, r3]`
-- face 5: `[-r3, g3, -y0]`
-- face 6: `[y0, g0, -r0]`
-- face 7: `[r0, g1, y3]`
+- face 0: `[y0, g3-, r3]`
+- face 1: `[r0, g0-, y0-]`
+- face 2: `[y3-, g1-, r0-]`
+- face 3: `[r3-, g2-, y3]`
+- face 4: `[r1-, g1, y2-]`
+- face 5: `[y1, g2, r2-]`
+- face 6: `[r2, g3, y1]`
+- face 7: `[face == 7]`

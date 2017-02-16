@@ -36,7 +36,7 @@
 //#include "gamma8.h"
 
 // Combine rbg values to color
-#define rgb(R, G, B)  (((R) << 16) | ((G) << 8) | (B))
+#define rgb(R, G, B)  ((((uint32_t)(R)) << 16) | (((uint32_t)(G)) << 8) | ((uint32_t)(B)))
 
 // Constansts
 const int ledsPerStrip = 456;
@@ -118,8 +118,8 @@ uint32_t lerpColor(uint32_t c1, uint32_t c2, float amt) {
   uint32_t r2 = (c2 & 0xff0000) >> 16;
   uint32_t g2 = (c2 & 0x00ff00) >> 8;
   uint32_t b2 = (c2 & 0x0000ff);
-  uint8_t r = ((r2 * i) + (r1 * di)) >> 8;
-  uint8_t g = ((g2 * i) + (g1 * di)) >> 8;
-  uint8_t b = ((b2 * i) + (b1 * di)) >> 8;
-  return (r << 16) | (g << 8) | b;
+  r1 = ((r2 * i) + (r1 * di)) >> 8;
+  g1 = ((g2 * i) + (g1 * di)) >> 8;
+  b1 = ((b2 * i) + (b1 * di)) >> 8;
+  return (r1 << 16) | (g1 << 8) | b1;
 }

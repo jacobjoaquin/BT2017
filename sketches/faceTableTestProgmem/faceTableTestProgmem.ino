@@ -31,7 +31,7 @@ pin 7:  LED strip #2
 #include "facetable.h"
 
 // Combines red, green, blue into a single value
-#define rgb(R, G, B)  (((R) << 16) | ((G) << 8) | (B))
+#define rgb(R, G, B)  ((((uint32_t)(R)) << 16) | (((uint32_t)(G)) << 8) | ((uint32_t)(B)))
 
 // Set a Triangle Face's LED
 //   F: Index of face. [0-7]  (use -1 for DEBUG)
