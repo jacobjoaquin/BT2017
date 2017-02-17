@@ -69,14 +69,14 @@ void loop() {
     bool reverse = heliadesReverse[reverseOffset];
 
     if (forward) {
-      int brightness = random(128, 255);
+      int brightness = random(200, 255);
       int color = rgb(brightness, brightness, brightness);
       leds.setPixel(i, color);
       leds.setPixel(i + ledsPerStrip, color);
       leds.setPixel(i + 2 *ledsPerStrip, color);
     }
     if (reverse) {
-      int brightness = random(128, 255);
+      int brightness = random(200, 255);
       int color = rgb(brightness, brightness, brightness);
       leds.setPixel(i, color);
       leds.setPixel(i + ledsPerStrip, color);
