@@ -45,18 +45,12 @@ int drawingMemory[ledsPerStrip * 6];
 const int config = WS2811_GRB | WS2811_800kHz;
 OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
 
-// Colors
-uint32_t orange = rgb(255, 64, 0);
-uint32_t magenta = rgb(255, 0, 192);
-uint32_t black = rgb(0, 0, 0);
-uint32_t white = rgb(255, 255, 255);
-
 // Heliades
 bool heliades[ledsPerStrip];
 bool heliadesReverse[ledsPerStrip];
-uint32_t forwardColor = orange;
-uint32_t reverseColor = magenta;
 int offset = 0;
+uint forwardOdds = 128;  // Chance on will flip to off. [0-255]
+uint reverseOdds = 32;   // Chance off will flip to on. [0-255]
 
 void setup() {
   leds.begin();
@@ -75,14 +69,18 @@ void loop() {
     bool reverse = heliadesReverse[reverseOffset];
 
     if (forward) {
-      leds.setPixel(i, forwardColor);
-      leds.setPixel(i + ledsPerStrip, forwardColor);
-      leds.setPixel(i + 2 *ledsPerStrip, forwardColor);
+      int brightness = random(128, 255);
+      int color = rgb(brightness, brightness, brightness);
+      leds.setPixel(i, color);
+      leds.setPixel(i + ledsPerStrip, color);
+      leds.setPixel(i + 2 *ledsPerStrip, color);
     }
     if (reverse) {
-      leds.setPixel(i, reverseColor);
-      leds.setPixel(i + ledsPerStrip, reverseColor);
-      leds.setPixel(i + 2 *ledsPerStrip, reverseColor);
+      int brightness = random(128, 255);
+      int color = rgb(brightness, brightness, brightness);
+      leds.setPixel(i, color);
+      leds.setPixel(i + ledsPerStrip, color);
+      leds.setPixel(i + 2 *ledsPerStrip, color);
     }
   }
 
@@ -104,11 +102,11 @@ void createHeliadesBuffer(bool *buffer) {
     buffer[i] = flip;
 
     if (flip) {
-      if (random(255) < 128) {
+      if (random(255) < forwardOdds) {
         flip = !flip;
       }
     } else {
-      if (random(255) < 32) {
+      if (random(255) < reverseOdds) {
         flip = !flip;
       }
     }
