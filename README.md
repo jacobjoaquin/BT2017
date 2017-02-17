@@ -41,6 +41,10 @@ I've renumbered the original Teensy Strips from 1-8 to 0-7. This is better align
 - i.e. `[r2, g3, y1-]`:
   - strip 2 beam 2 -> strip 0 beam 3 -> strip 1 beam 1 (reverse)
 
+### Faces
+
+![Face Map](./assets/faceMap.png)
+
 #### Layout for each face
 
 - face 0: `[y0, g3-, r3]`
