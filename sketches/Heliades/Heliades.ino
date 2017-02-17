@@ -1,5 +1,5 @@
 /*  Heliades.ino - Heliades Pattern
-    Inspired by Helios, Disorient 2014, by Leo Villareal.
+Inspired by Helios, Disorient 2014, by Leo Villareal.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,39 +45,51 @@ int drawingMemory[ledsPerStrip * 6];
 const int config = WS2811_GRB | WS2811_800kHz;
 OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
 
+// Colors
+uint32_t orange = rgb(255, 64, 0);
+uint32_t magenta = rgb(255, 0, 192);
+uint32_t black = rgb(0, 0, 0);
+uint32_t white = rgb(255, 255, 255);
+
 // Heliades
 bool heliades[ledsPerStrip];
-uint32_t forwardColor = rgb(255, 255, 255);
-uint32_t reverseColor = rgb(255, 255, 255);
+bool heliadesReverse[ledsPerStrip];
+uint32_t forwardColor = orange;
+uint32_t reverseColor = magenta;
 int offset = 0;
 
 void setup() {
   leds.begin();
-  createHeliadesBuffer();
+  createHeliadesBuffer(heliades);
+  createHeliadesBuffer(heliadesReverse);
 }
 
 void loop() {
   clear();
 
   for (int i = 0; i < ledsPerStrip; i++) {
-    int thisOffset = (i + offset) % ledsPerStrip;
-    if (heliades[thisOffset]) {
+    int r = ledsPerStrip - i - 1;
+    int forwardOffset = (i + offset) % ledsPerStrip;
+    int reverseOffset = (r + offset) % ledsPerStrip;
+    bool forward = heliades[forwardOffset];
+    bool reverse = heliadesReverse[reverseOffset];
+
+    if (forward) {
       leds.setPixel(i, forwardColor);
       leds.setPixel(i + ledsPerStrip, forwardColor);
       leds.setPixel(i + 2 *ledsPerStrip, forwardColor);
-
-      // Opposite direction
-      int r = ledsPerStrip - i - 1;
-      leds.setPixel(r, reverseColor);
-      leds.setPixel(r + ledsPerStrip, reverseColor);
-      leds.setPixel(r + 2 *ledsPerStrip, reverseColor);
+    }
+    if (reverse) {
+      leds.setPixel(i, reverseColor);
+      leds.setPixel(i + ledsPerStrip, reverseColor);
+      leds.setPixel(i + 2 *ledsPerStrip, reverseColor);
     }
   }
+
   offset = (offset + 1) % ledsPerStrip;
   leds.show();
   delay(frameDelay);
 }
-
 
 // Clear all the pixels
 void clear() {
@@ -86,10 +98,10 @@ void clear() {
   }
 }
 
-void createHeliadesBuffer() {
+void createHeliadesBuffer(bool *buffer) {
   bool flip = true;
   for (int i = 0; i < ledsPerStrip; i++) {
-    heliades[i] = flip;
+    buffer[i] = flip;
 
     if (flip) {
       if (random(255) < 128) {
