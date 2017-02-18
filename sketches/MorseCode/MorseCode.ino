@@ -28,9 +28,13 @@ pin 7:  LED strip #2
 */
 
 #include <OctoWS2811.h>
+#include "encoded.h"
 
 // Combines red, green, blue into a single value
 #define rgb(R, G, B)  ((((uint32_t)(R)) << 16) | (((uint32_t)(G)) << 8) | ((uint32_t)(B)))
+
+// Get encoded
+#define getEncoded(I) (pgm_read_byte([&(I)])
 
 const int ledsPerStrip = 456;
 const int nStrips = 3;
@@ -47,11 +51,8 @@ const int config = WS2811_GRB | WS2811_800kHz;
 OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
 
 // Morse Code
-
 void setup() {
   leds.begin();
-  createHeliadesBuffer(heliades);
-  createHeliadesBuffer(heliadesReverse);
 }
 
 void loop() {

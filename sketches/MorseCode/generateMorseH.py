@@ -1,8 +1,6 @@
 #!/usr/bin/python
 
-quote = '''
-HELLO WORLD DISORIENT PRESENTS BEDOUIN TECH 2017 CREATE PARTICIPATE LOVE DISORIENT LOVES YOU
-'''
+quote = 'HELLO WORLD DISORIENT PRESENTS BEDOUIN TECH 2017 CREATE PARTICIPATE LOVE DISORIENT LOVES YOU'
 
 dur = {'.': 1, '-': 3, 'letter': 3, 'space': 7, 'none': 0}
 morse = {
@@ -37,13 +35,10 @@ for c in quote:
 
 encoded += (dur['space']  -  3) * ' '
 
-
-print("'" + encoded + "'")
-print(len(encoded))
-
+# Generate output
 output = '// File Generated with generateMorseH.py\n'
 output += '// ' + quote + '\n'
-output += 'const uint8_t faceTable[] PROGMEM = {'
+output += 'const uint8_t encoded[] PROGMEM = {'
 for c in encoded:
     if c == ' ':
         output += data_table[c] + ", "
@@ -62,5 +57,8 @@ output += '};\n'
 with open('encoded.h', 'w') as f:
     f.write(output)
 
+# Print results
+print("'" + encoded + "'")
+print(len(encoded))
 print(output)
 print(encoded)
