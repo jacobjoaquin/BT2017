@@ -1,5 +1,7 @@
-/*  Heliades.ino - Heliades Pattern
+/*
+Heliades.ino - Heliades Pattern
 Inspired by Helios, Disorient 2014, by Leo Villareal.
+Coded by Jacob Joaquin.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

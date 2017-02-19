@@ -1,6 +1,6 @@
-/*  OctoWS2811 BasicTest.ino - Basic RGB LED Test
-http://www.pjrc.com/teensy/td_libs_OctoWS2811.html
-Copyright (c) 2013 Paul Stoffregen, PJRC.COM, LLC
+/*
+faceTableTestProgmem.ino
+Coded by Jacob Joaquin.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
