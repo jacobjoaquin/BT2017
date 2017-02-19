@@ -1,9 +1,11 @@
 # Bedouin Tech 2017 Presents: Geodesic Temple -CRYPTO-
 
-## Patterns for Show
+## Patterns for Display
 
 - patternBeamSnakes
+- patternBeamSnakesWhite
 - MorseCode
+- MorseCodeWhite
 - Heliades
 
 ## Important!
