@@ -1,5 +1,5 @@
 /*
-patternBeamSnakes.ino - Beam Snakes Pattern
+patternBeamSnakesWhite.ino - Beam Snakes Pattern
 Coded by Jacob Joaquin.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -48,18 +48,10 @@ int drawingMemory[ledsPerStrip * 6];
 const int config = WS2811_GRB | WS2811_800kHz;
 OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
 
-// User defined variables
-uint32_t orange = rgb(255, 64, 0);
-uint32_t magenta = rgb(255, 0, 192);
-uint32_t black = rgb(0, 0, 0);
-uint32_t white = rgb(255, 255, 255);
-int pos = 0;
-
 // Set tail properties
-uint32_t tailColor = rgb(96, 96, 96);
-uint32_t headColor = white;
 int tail = ledsPerBeam / 4;
 int head = ledsPerBeam / 12;
+int pos = 0;
 
 void setup() {
   leds.begin();
@@ -71,13 +63,19 @@ void loop() {
   for (int i = 0; i < tail; i++) {
     uint32_t thisColor;
 
+    // Randomize brightness for head and tail
+    uint32_t h = random(240, 256); // Head
+    uint32_t t = random(96, 128);  // Tail
+    h = rgb(h, h, h);
+    t = rgb(t, t, t);
+
     // Head
     if (i > tail - head) {
-      thisColor = lerpColor(tailColor, headColor, (float) (i - (tail - head)) / (float) head);
+      thisColor = lerpColor(t, h, (float) (i - (tail - head)) / (float) head);
     }
     // Tail
     else {
-      thisColor = lerpColor(black, tailColor, (float) i / (float) (tail - head));
+      thisColor = lerpColor(0, t, (float) i / (float) (tail - head));
     }
 
     int forwardIndex = (i + pos) % ledsPerHalfBeam;

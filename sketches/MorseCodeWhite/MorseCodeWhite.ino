@@ -1,5 +1,5 @@
 /*
-MorseCode.ino - Morse Code Pattern
+MorseCodeWhite.ino - Morse Code Pattern
 Coded by Jacob Joaquin.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
