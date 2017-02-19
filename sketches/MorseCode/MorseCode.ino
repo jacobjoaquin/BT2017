@@ -42,7 +42,7 @@ const int nFaces = 8;
 const int nLeds = ledsPerStrip * nStrips;
 const int ledsPerBeam = ledsPerStrip / 4;
 const int ledsPerFace = 3 * ledsPerBeam;
-const int frameDelay = 1000 / 60;
+const int frameDelay = 1000 / 120;
 
 // Setup OctoWS2811 library
 DMAMEM int displayMemory[ledsPerStrip * 6];
@@ -61,26 +61,75 @@ uint32_t dotColor = orange;
 uint32_t dahColor = orange;
 
 // Morse Code
-int counter = 0;
+int framesLeft = ledsPerBeam;
+int stripOffsets[nStrips] = {0};
+int stripColors[nStrips] = {orange};
 
+
+int targetStrip = 0;
+int targetDirection = 1;
 void setup() {
   leds.begin();
 }
 
 void loop() {
   clear();
-  for (int i = 0; i < nLeds; i++) {
-    int index = (i + counter) % encodedLength;
-    uint8_t v = getEncoded(index);
-    if (v == 1) {
-      leds.setPixel(i, dotColor);
-    } else if (v == 2) {
-      leds.setPixel(i, dahColor);
+
+  framesLeft--;
+
+  int offset = stripOffsets[targetStrip];
+  offset += targetDirection;
+  if (offset == ledsPerStrip) {
+    offset -= ledsPerStrip;
+  } else if (offset < 0) {
+    offset += ledsPerStrip;
+  }
+  stripOffsets[targetStrip] = offset;
+
+  // Display LEDs
+  for (int i = 0; i < nStrips; i++ ) {
+    int stripOffset = stripOffsets[i];
+    for (int j = 0; j < ledsPerStrip; j++) {
+      int index = (j + stripOffset) % encodedLength;
+      uint8_t v = getEncoded(index);
+      if (v == 1) {
+        leds.setPixel(j + i * ledsPerStrip, dotColor);
+      } else if (v == 2) {
+        leds.setPixel(j + i * ledsPerStrip, dahColor);
+      }
     }
   }
+
+  // Choose next
+  if (framesLeft == 0) {
+    framesLeft = ledsPerStrip / 4;
+
+    int lastTargetStrip = targetStrip;
+    targetStrip = random(0, nStrips);
+
+    if (targetStrip == lastTargetStrip) {
+      targetDirection *= -1;
+    } else {
+      targetDirection = random(2) ? -1 : 1;
+    }
+  }
+
+
+
+
+  // for (int i = 0; i < nLeds; i++) {
+  //   int index = (i + counter) % encodedLength;
+  //   uint8_t v = getEncoded(index);
+  //   if (v == 1) {
+  //     leds.setPixel(i, dotColor);
+  //   } else if (v == 2) {
+  //     leds.setPixel(i, dahColor);
+  //   }
+  // }
+  // counter = (counter + 1) % encodedLength;
+
   leds.show();
   delay(frameDelay);
-  counter = (counter + 1) % encodedLength;
 }
 
 // Clear all the pixels
