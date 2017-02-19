@@ -1,5 +1,5 @@
 /*
-MorseCode.ino - Morse Code Pattern
+MorseCodeWhite.ino - Morse Code Pattern
 Coded by Jacob Joaquin.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -65,8 +65,8 @@ uint32_t white = rgb(255, 255, 255);
 
 // Morse Code
 int stripOffsets[nStrips] = {0};
-uint32_t palette[] = {orange, magenta, black};
-// uint32_t palette[] = {orange, magenta};
+// uint32_t palette[] = {orange, magenta, black};
+uint32_t palette[] = {black, white, rgb(128, 128, 128)};
 int paletteSize = sizeof(palette) / sizeof(uint32_t);
 int lastColors[nStrips] = {0};
 int currentColors[nStrips] = {1};
