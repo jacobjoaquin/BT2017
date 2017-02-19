@@ -30,6 +30,8 @@ pin 7:  LED strip #2
 #include <OctoWS2811.h>
 #include "encoded.h"
 
+#define TWOPI (6.28318530717958647693)
+
 // Combines red, green, blue into a single value
 #define rgb(R, G, B)  ((((uint32_t)(R)) << 16) | (((uint32_t)(G)) << 8) | ((uint32_t)(B)))
 
@@ -50,19 +52,21 @@ int drawingMemory[ledsPerStrip * 6];
 const int config = WS2811_GRB | WS2811_800kHz;
 OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
 
+// Sine Table
+const int sineTableSize = 1024;
+float sineTable[sineTableSize] = {0};
+float stripToSineTableSize = 1.0 / (float) ledsPerStrip * (float) sineTableSize;
+
 // Colors
 uint32_t orange = rgb(255, 64, 0);
 uint32_t magenta = rgb(255, 0, 128);
 uint32_t black = rgb(0, 0, 0);
 uint32_t white = rgb(255, 255, 255);
-// uint32_t dotColor = magenta;
-// uint32_t dahColor = orange;
-uint32_t dotColor = orange;
-uint32_t dahColor = orange;
 
 // Morse Code
 int stripOffsets[nStrips] = {0};
-uint32_t palette[] = {black, orange, magenta};
+// uint32_t palette[] = {orange, magenta, black};
+uint32_t palette[] = {orange, magenta};
 int paletteSize = sizeof(palette) / sizeof(uint32_t);
 int lastColors[nStrips] = {0};
 int currentColors[nStrips] = {1};
@@ -72,7 +76,13 @@ int targetDirection = 1;
 
 int framesPerTransition = ledsPerStrip / 4;
 int framesLeft = framesPerTransition;
+
+// Swell
+float swellInc = 1.0 / 60.0;
+float swellPhase = 0.0;
+
 void setup() {
+  createSineTable();
   leds.begin();
 }
 
@@ -103,17 +113,21 @@ void loop() {
       int index = (j + stripOffset) % encodedLength;
       uint8_t v = getEncoded(index);
       if (v) {
-        leds.setPixel(j + i * ledsPerStrip, c);
+        int swellAmount = sineTable[((int) (swellPhase * (float) sineTableSize + (float) j * stripToSineTableSize) % sineTableSize)];
+        float thisColor = c;
+        thisColor = lerpColor(thisColor, black, swellAmount);
+        leds.setPixel(j + i * ledsPerStrip, thisColor);
       }
     }
   }
 
   // Choose next
   if (framesLeft == 0) {
+    // Reset frame counter
     framesLeft = framesPerTransition;
 
+    // Move current into last
     lastColors[targetStrip] = currentColors[targetStrip];
-
 
     // Select new target
     int lastTargetStrip = targetStrip;
@@ -130,8 +144,12 @@ void loop() {
     while (newColor == currentColors[targetStrip]) {
       newColor = random(0, paletteSize);
     }
-    // currentColors[targetStrip] = 1 - currentColors[targetStrip];
     currentColors[targetStrip] = newColor;
+  }
+
+  swellPhase += swellInc;
+  if (swellPhase >= 1.0) {
+    swellPhase -= 1.0;
   }
 
   leds.show();
@@ -159,4 +177,37 @@ uint32_t lerpColor(uint32_t c1, uint32_t c2, float amt) {
   g1 = ((g2 * i) + (g1 * di)) >> 8;
   b1 = ((b2 * i) + (b1 * di)) >> 8;
   return (r1 << 16) | (g1 << 8) | b1;
+}
+
+uint32_t lerpColor(uint32_t c1, uint32_t c2, int amt) {
+  int i = amt + 1;
+  int di = 256 - i;
+  uint32_t r1 = (c1 & 0xff0000) >> 16;
+  uint32_t g1 = (c1 & 0x00ff00) >> 8;
+  uint32_t b1 = (c1 & 0x0000ff);
+  uint32_t r2 = (c2 & 0xff0000) >> 16;
+  uint32_t g2 = (c2 & 0x00ff00) >> 8;
+  uint32_t b2 = (c2 & 0x0000ff);
+  r1 = ((r2 * i) + (r1 * di)) >> 8;
+  g1 = ((g2 * i) + (g1 * di)) >> 8;
+  b1 = ((b2 * i) + (b1 * di)) >> 8;
+  return (r1 << 16) | (g1 << 8) | b1;
+}
+
+
+uint32_t shiftColor(uint32_t c, int shift) {
+  uint32_t r1 = (c & 0xff0000) >> 16;
+  uint32_t g1 = (c & 0x00ff00) >> 8;
+  uint32_t b1 = (c & 0x0000ff);
+  r1 = r1 >> shift;
+  g1 = g1 >> shift;
+  b1 = b1 >> shift;
+  return (r1 << 16) | (g1 << 8) | b1;
+}
+
+void createSineTable() {
+  for (int i = 0; i < sineTableSize; i++) {
+    float v = (sin((float) i / (float) sineTableSize * TWOPI) * 0.5 + 0.5) * 255.0;
+    sineTable[i] = (int) v;
+  }
 }
