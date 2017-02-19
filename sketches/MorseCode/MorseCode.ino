@@ -52,7 +52,7 @@ OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
 
 // Colors
 uint32_t orange = rgb(255, 64, 0);
-uint32_t magenta = rgb(255, 0, 192);
+uint32_t magenta = rgb(255, 0, 128);
 uint32_t black = rgb(0, 0, 0);
 uint32_t white = rgb(255, 255, 255);
 // uint32_t dotColor = magenta;
@@ -61,13 +61,16 @@ uint32_t dotColor = orange;
 uint32_t dahColor = orange;
 
 // Morse Code
-int framesLeft = ledsPerBeam;
 int stripOffsets[nStrips] = {0};
-int stripColors[nStrips] = {orange};
-
+uint32_t palette[] = {orange, magenta};
+int lastColors[nStrips] = {0};
+int currentColors[nStrips] = {1};
 
 int targetStrip = 0;
 int targetDirection = 1;
+
+int framesPerTransition = ledsPerStrip / 4;
+int framesLeft = framesPerTransition;
 void setup() {
   leds.begin();
 }
@@ -89,21 +92,29 @@ void loop() {
   // Display LEDs
   for (int i = 0; i < nStrips; i++ ) {
     int stripOffset = stripOffsets[i];
+
+    // Color
+    uint32_t c0 = palette[lastColors[i]];
+    uint32_t c1 = palette[currentColors[i]];
+    uint32_t c = lerpColor(c0, c1, (float) (framesPerTransition - 1 - framesLeft) / (float) framesPerTransition);
+
     for (int j = 0; j < ledsPerStrip; j++) {
       int index = (j + stripOffset) % encodedLength;
       uint8_t v = getEncoded(index);
-      if (v == 1) {
-        leds.setPixel(j + i * ledsPerStrip, dotColor);
-      } else if (v == 2) {
-        leds.setPixel(j + i * ledsPerStrip, dahColor);
+      if (v) {
+        leds.setPixel(j + i * ledsPerStrip, c);
       }
     }
   }
 
   // Choose next
   if (framesLeft == 0) {
-    framesLeft = ledsPerStrip / 4;
+    framesLeft = framesPerTransition;
 
+    lastColors[targetStrip] = currentColors[targetStrip];
+
+
+    // Select new target
     int lastTargetStrip = targetStrip;
     targetStrip = random(0, nStrips);
 
@@ -112,6 +123,9 @@ void loop() {
     } else {
       targetDirection = random(2) ? -1 : 1;
     }
+
+    // Only works with 2 colors
+    currentColors[targetStrip] = 1 - currentColors[targetStrip];
   }
 
 
@@ -137,4 +151,20 @@ void clear() {
   for (int i = 0; i < nLeds; i++) {
     leds.setPixel(i, 0);
   }
+}
+
+// Interpolate between two colors.
+uint32_t lerpColor(uint32_t c1, uint32_t c2, float amt) {
+  int i = (int) (amt * 256.0) + 1;
+  int di = 256 - i;
+  uint32_t r1 = (c1 & 0xff0000) >> 16;
+  uint32_t g1 = (c1 & 0x00ff00) >> 8;
+  uint32_t b1 = (c1 & 0x0000ff);
+  uint32_t r2 = (c2 & 0xff0000) >> 16;
+  uint32_t g2 = (c2 & 0x00ff00) >> 8;
+  uint32_t b2 = (c2 & 0x0000ff);
+  r1 = ((r2 * i) + (r1 * di)) >> 8;
+  g1 = ((g2 * i) + (g1 * di)) >> 8;
+  b1 = ((b2 * i) + (b1 * di)) >> 8;
+  return (r1 << 16) | (g1 << 8) | b1;
 }
