@@ -65,8 +65,8 @@ uint32_t white = rgb(255, 255, 255);
 
 // Morse Code
 int stripOffsets[nStrips] = {0};
-// uint32_t palette[] = {orange, magenta, black};
-uint32_t palette[] = {orange, magenta};
+uint32_t palette[] = {orange, magenta, black};
+// uint32_t palette[] = {orange, magenta};
 int paletteSize = sizeof(palette) / sizeof(uint32_t);
 int lastColors[nStrips] = {0};
 int currentColors[nStrips] = {1};
@@ -75,12 +75,12 @@ int targetStrip = 0;
 int targetDirection = 1;
 
 int framesPerTransition = ledsPerStrip / 4;
+float framesPerTransitionInv = 1.0 / (float) framesPerTransition;
 int framesLeft = framesPerTransition;
 
 // Phasors
 float phaseBank[3] = {0};
-float phaseIncBank[3] = {1.0 / 60.0, 1.0 / 63.0, 1.0 / 67.0};
-
+float phaseIncBank[3] = {1.0 / 120.0, 1.0 / 125.0, 1.0 / 115.0};
 
 void setup() {
   createSineTable();
@@ -89,7 +89,6 @@ void setup() {
 
 void loop() {
   clear();
-
   framesLeft--;
 
   int offset = stripOffsets[targetStrip];
@@ -101,24 +100,29 @@ void loop() {
   }
   stripOffsets[targetStrip] = offset;
 
-  // Display LEDs
+  // Display each Strip
   for (int i = 0; i < nStrips; i++ ) {
     int stripOffset = stripOffsets[i];
+
+    // LFO Phase
     float phase = phaseBank[i];
+    float phaseOffset = phase * (float) sineTableSize;
 
     // Color
     uint32_t c0 = palette[lastColors[i]];
     uint32_t c1 = palette[currentColors[i]];
-    uint32_t c = lerpColor(c0, c1, (float) (framesPerTransition - 1 - framesLeft) / (float) framesPerTransition);
+    uint32_t c = lerpColor(c0, c1, (float) (framesPerTransition - 1 - framesLeft) * framesPerTransitionInv);
 
+    // Update LEDs
     for (int j = 0; j < ledsPerStrip; j++) {
+      // Get morse from buffer
       int index = (j + stripOffset) % encodedLength;
       uint8_t v = getEncoded(index);
+
+      // Display
       if (v) {
-        int swellAmount = sineTable[((int) (phase * (float) sineTableSize + (float) j * stripToSineTableSize) % sineTableSize)];
-        float thisColor = c;
-        thisColor = lerpColor(thisColor, black, swellAmount);
-        leds.setPixel(j + i * ledsPerStrip, thisColor);
+        int lfo = sineTable[((int) (phaseOffset + (float) j * stripToSineTableSize) % sineTableSize)];
+        leds.setPixel(j + i * ledsPerStrip, lerpColor(c, black, lfo));
       }
     }
   }
@@ -131,14 +135,14 @@ void loop() {
     // Move current into last
     lastColors[targetStrip] = currentColors[targetStrip];
 
-    // Select new target
+    // Select new target and rotational direction
     int lastTargetStrip = targetStrip;
     targetStrip = random(0, nStrips);
 
     if (targetStrip == lastTargetStrip) {
       targetDirection *= -1;
     } else {
-      targetDirection = random(2) ? -1 : 1;
+      targetDirection = 1 - random(2) * 2;  // 1 or -1
     }
 
     // Select from colors
@@ -149,66 +153,16 @@ void loop() {
     currentColors[targetStrip] = newColor;
   }
 
+  // Update phasor bank
   for (int i = 0; i < 3; i++) {
     float phase = phaseBank[i];
     phase += phaseIncBank[i];
-    if (phase >= 1.0) {
-      phase -= 1.0;
-    }
+    phase -= (int) phase;
     phaseBank[i] = phase;
   }
 
   leds.show();
   delay(frameDelay);
-}
-
-// Clear all the pixels
-void clear() {
-  for (int i = 0; i < nLeds; i++) {
-    leds.setPixel(i, 0);
-  }
-}
-
-// Interpolate between two colors.
-uint32_t lerpColor(uint32_t c1, uint32_t c2, float amt) {
-  int i = (int) (amt * 256.0) + 1;
-  int di = 256 - i;
-  uint32_t r1 = (c1 & 0xff0000) >> 16;
-  uint32_t g1 = (c1 & 0x00ff00) >> 8;
-  uint32_t b1 = (c1 & 0x0000ff);
-  uint32_t r2 = (c2 & 0xff0000) >> 16;
-  uint32_t g2 = (c2 & 0x00ff00) >> 8;
-  uint32_t b2 = (c2 & 0x0000ff);
-  r1 = ((r2 * i) + (r1 * di)) >> 8;
-  g1 = ((g2 * i) + (g1 * di)) >> 8;
-  b1 = ((b2 * i) + (b1 * di)) >> 8;
-  return (r1 << 16) | (g1 << 8) | b1;
-}
-
-uint32_t lerpColor(uint32_t c1, uint32_t c2, int amt) {
-  int i = amt + 1;
-  int di = 256 - i;
-  uint32_t r1 = (c1 & 0xff0000) >> 16;
-  uint32_t g1 = (c1 & 0x00ff00) >> 8;
-  uint32_t b1 = (c1 & 0x0000ff);
-  uint32_t r2 = (c2 & 0xff0000) >> 16;
-  uint32_t g2 = (c2 & 0x00ff00) >> 8;
-  uint32_t b2 = (c2 & 0x0000ff);
-  r1 = ((r2 * i) + (r1 * di)) >> 8;
-  g1 = ((g2 * i) + (g1 * di)) >> 8;
-  b1 = ((b2 * i) + (b1 * di)) >> 8;
-  return (r1 << 16) | (g1 << 8) | b1;
-}
-
-
-uint32_t shiftColor(uint32_t c, int shift) {
-  uint32_t r1 = (c & 0xff0000) >> 16;
-  uint32_t g1 = (c & 0x00ff00) >> 8;
-  uint32_t b1 = (c & 0x0000ff);
-  r1 = r1 >> shift;
-  g1 = g1 >> shift;
-  b1 = b1 >> shift;
-  return (r1 << 16) | (g1 << 8) | b1;
 }
 
 void createSineTable() {
