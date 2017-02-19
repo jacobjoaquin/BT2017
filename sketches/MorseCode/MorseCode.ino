@@ -62,7 +62,8 @@ uint32_t dahColor = orange;
 
 // Morse Code
 int stripOffsets[nStrips] = {0};
-uint32_t palette[] = {orange, magenta};
+uint32_t palette[] = {black, orange, magenta};
+int paletteSize = sizeof(palette) / sizeof(uint32_t);
 int lastColors[nStrips] = {0};
 int currentColors[nStrips] = {1};
 
@@ -124,23 +125,14 @@ void loop() {
       targetDirection = random(2) ? -1 : 1;
     }
 
-    // Only works with 2 colors
-    currentColors[targetStrip] = 1 - currentColors[targetStrip];
+    // Select from colors
+    int newColor = random(0, paletteSize);
+    while (newColor == currentColors[targetStrip]) {
+      newColor = random(0, paletteSize);
+    }
+    // currentColors[targetStrip] = 1 - currentColors[targetStrip];
+    currentColors[targetStrip] = newColor;
   }
-
-
-
-
-  // for (int i = 0; i < nLeds; i++) {
-  //   int index = (i + counter) % encodedLength;
-  //   uint8_t v = getEncoded(index);
-  //   if (v == 1) {
-  //     leds.setPixel(i, dotColor);
-  //   } else if (v == 2) {
-  //     leds.setPixel(i, dahColor);
-  //   }
-  // }
-  // counter = (counter + 1) % encodedLength;
 
   leds.show();
   delay(frameDelay);
