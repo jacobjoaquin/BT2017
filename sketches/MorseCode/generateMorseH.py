@@ -27,32 +27,36 @@ for c in quote:
         for m in morse[c]:
             encoded += m;
 
-        encoded += dur['letter'] * ' ';
+        encoded += ' ';
 
     # Space
     elif c == ' ':
-        encoded += (dur['space']  -  3) * ' '
+        encoded += ' '
 
-encoded += (dur['space']  -  3) * ' '
+# encoded += ' '
+
+# Generate data
+data = []
+for c in encoded:
+    if c == ' ':
+        data.append(0)
+        data.append(0)
+    elif  c == '.':
+        data.append(1)
+        data.append(0)
+    elif c == '-':
+        data.append(2)
+        data.append(2)
+        data.append(2)
+        data.append(0)
 
 # Generate output
 output = '// File Generated with generateMorseH.py\n'
 output += '// ' + quote + '\n'
 output += 'const uint8_t encoded[] PROGMEM = {'
-for c in encoded:
-    if c == ' ':
-        output += data_table[c] + ", "
-    elif  c == '.':
-        output += data_table[c] + ", "
-        output += '0' + ", "
-    elif c == '-':
-        output += data_table[c] + ", "
-        output += data_table[c] + ", "
-        output += data_table[c] + ", "
-        output += '0' + ", "
-
-output = output[:-2]
+output += ', '.join(map(str, data));
 output += '};\n'
+output += 'const int encodedLength = ' + str(len(data)) + ';\n'
 
 with open('encoded.h', 'w') as f:
     f.write(output)
