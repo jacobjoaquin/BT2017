@@ -1,3 +1,25 @@
+// Create the beamBuffer
+void createBeamBuffer() {
+  int halfBeam = ledsPerBeam / 2;
+
+  for (int i = 0; i < halfBeam; i++) {
+    float amt = (float) i / (float) halfBeam;
+    uint32_t c0 = lerpColor(0, orange, amt);
+    uint32_t c1 = lerpColor(magenta, 0, amt);
+    for (int j = 0; j < nBeams; j++) {
+      beamBuffer[i + j * ledsPerBeam] = c0;
+      beamBuffer[i + halfBeam + j * ledsPerBeam] = c1;
+    }
+  }
+}
+
+// sets LEDs to contents of beamBuffer
+void displayBeamBuffer() {
+  for (int i = 0; i < nLeds; i++) {
+    leds.setPixel(i, beamBuffer[i]);
+  }
+}
+
 // Generate SineTable
 void createSineTable() {
   for (int i = 0; i < sineTableSize; i++) {

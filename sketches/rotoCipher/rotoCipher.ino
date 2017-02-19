@@ -38,6 +38,7 @@ pin 7:  LED strip #2
 const int ledsPerStrip = 456;
 const int nStrips = 3;
 const int nFaces = 8;
+const int nBeams = nStrips * 4;
 const int nLeds = ledsPerStrip * nStrips;
 const int ledsPerBeam = ledsPerStrip / 4;
 const int ledsPerFace = 3 * ledsPerBeam;
@@ -54,6 +55,9 @@ const int sineTableSize = 1024;
 float sineTable[sineTableSize] = {0};
 float stripToSineTableSize = 1.0 / (float) ledsPerStrip * (float) sineTableSize;
 
+// Buffer
+uint32_t beamBuffer[nLeds] = {0};
+
 // Colors
 uint32_t orange = rgb(255, 64, 0);
 uint32_t magenta = rgb(255, 0, 128);
@@ -62,9 +66,13 @@ uint32_t white = rgb(255, 255, 255);
 
 void setup() {
   createSineTable();
+  createBeamBuffer();
   leds.begin();
 }
 
 void loop() {
   clear();
+  displayBeamBuffer();
+  leds.show();
+  delay(frameDelay);
 }
