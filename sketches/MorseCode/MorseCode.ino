@@ -77,9 +77,10 @@ int targetDirection = 1;
 int framesPerTransition = ledsPerStrip / 4;
 int framesLeft = framesPerTransition;
 
-// Swell
-float swellInc = 1.0 / 60.0;
-float swellPhase = 0.0;
+// Phasors
+float phaseBank[3] = {0};
+float phaseIncBank[3] = {1.0 / 60.0, 1.0 / 63.0, 1.0 / 67.0};
+
 
 void setup() {
   createSineTable();
@@ -103,6 +104,7 @@ void loop() {
   // Display LEDs
   for (int i = 0; i < nStrips; i++ ) {
     int stripOffset = stripOffsets[i];
+    float phase = phaseBank[i];
 
     // Color
     uint32_t c0 = palette[lastColors[i]];
@@ -113,7 +115,7 @@ void loop() {
       int index = (j + stripOffset) % encodedLength;
       uint8_t v = getEncoded(index);
       if (v) {
-        int swellAmount = sineTable[((int) (swellPhase * (float) sineTableSize + (float) j * stripToSineTableSize) % sineTableSize)];
+        int swellAmount = sineTable[((int) (phase * (float) sineTableSize + (float) j * stripToSineTableSize) % sineTableSize)];
         float thisColor = c;
         thisColor = lerpColor(thisColor, black, swellAmount);
         leds.setPixel(j + i * ledsPerStrip, thisColor);
@@ -147,9 +149,13 @@ void loop() {
     currentColors[targetStrip] = newColor;
   }
 
-  swellPhase += swellInc;
-  if (swellPhase >= 1.0) {
-    swellPhase -= 1.0;
+  for (int i = 0; i < 3; i++) {
+    float phase = phaseBank[i];
+    phase += phaseIncBank[i];
+    if (phase >= 1.0) {
+      phase -= 1.0;
+    }
+    phaseBank[i] = phase;
   }
 
   leds.show();
