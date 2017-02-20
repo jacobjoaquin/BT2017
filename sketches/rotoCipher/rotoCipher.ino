@@ -28,12 +28,19 @@ pin 7:  LED strip #2
 */
 
 #include <OctoWS2811.h>
+#include "facetable.h"
 
 #define TWOPI (6.28318530717958647693)
 
 // Combines red, green, blue into a single value
 #define rgb(R, G, B)  ((((uint32_t)(R)) << 16) | (((uint32_t)(G)) << 8) | ((uint32_t)(B)))
 
+// Set a Triangle Face's LED
+//   F: Index of face. [0-7]  (use -1 for DEBUG)
+//   I: index of LED in face. [0-ledsPerFace)
+//   C: Color
+#define setFaceLED(F, I, C) (leds.setPixel(pgm_read_word(&faceTable[(F) * ledsPerFace + (I)]), (C)))
+#define getFaceLED(F, I) (pgm_read_word(&faceTable[(F) * ledsPerFace + (I)]))
 
 const int ledsPerStrip = 456;
 const int nStrips = 3;
@@ -71,8 +78,24 @@ void setup() {
 }
 
 void loop() {
+  ulong showTime = millis() + frameDelay;
   clear();
+
+  rotateFace(random(0, nFaces), true);
+
+  // Display
   displayBeamBuffer();
+  while(millis() < showTime) {
+    // HDQUODSLOTCQYJIHWTSRAGFIMWAKBHXDTXES
+  }
   leds.show();
-  delay(frameDelay);
+}
+
+void rotateFace(int face, bool isForward) {
+  int tempIndex = getFaceLED(face, 0);
+  // uint32_t tempColor = beamBuffer[tempIndex];
+  for (int i = 0; i < ledsPerFace - 1; i++) {
+    beamBuffer[getFaceLED(face, i)] = beamBuffer[getFaceLED(face, i + 1)];
+  }
+  beamBuffer[getFaceLED(face, ledsPerFace - 1)] = beamBuffer[tempIndex];
 }
