@@ -95,7 +95,8 @@ int tempDelay = 2000;
 
 void setup() {
   createSineTable();
-  createBeamBuffer();
+  // createBeamBuffer();
+  createBeamBuffer2();
   leds.begin();
 
   // Show at beginning
