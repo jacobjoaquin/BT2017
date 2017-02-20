@@ -2,6 +2,7 @@
 
 ## Patterns for Display
 
+- rotoCipher
 - patternBeamSnakes
 - patternBeamSnakesWhite
 - MorseCode
