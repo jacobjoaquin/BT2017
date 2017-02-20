@@ -14,7 +14,7 @@ void createBeamBuffer() {
 }
 
 // sets LEDs to contents of beamBuffer
-void displayBeamBuffer() {
+void beamBufferToLEDs() {
   for (int i = 0; i < nLeds; i++) {
     leds.setPixel(i, beamBuffer[i]);
   }

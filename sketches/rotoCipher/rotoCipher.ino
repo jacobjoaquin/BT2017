@@ -71,6 +71,10 @@ uint32_t magenta = rgb(255, 0, 128);
 uint32_t black = rgb(0, 0, 0);
 uint32_t white = rgb(255, 255, 255);
 
+//
+int framesLeft = 64;
+int currentFace = 0;
+
 void setup() {
   createSineTable();
   createBeamBuffer();
@@ -78,17 +82,31 @@ void setup() {
 }
 
 void loop() {
-  ulong showTime = millis() + frameDelay;
   clear();
 
-  rotateFace(random(0, nFaces), true);
+  framesLeft--;
+
+
+  rotateFace(currentFace, true);
+  rotateFace((currentFace + nFaces / 2) % nFaces, true);
+
+  if (framesLeft == 0) {
+    currentFace = random(nFaces);
+    framesLeft = 2 << random(1, 8);
+  }
+
 
   // Display
-  displayBeamBuffer();
-  while(millis() < showTime) {
-    // HDQUODSLOTCQYJIHWTSRAGFIMWAKBHXDTXES
-  }
+  beamBufferToLEDs();
+  displayLEDs();
+}
+
+ulong showTime = millis() + frameDelay;
+
+void displayLEDs() {
+  while(millis() < showTime) {}
   leds.show();
+  showTime = millis() + frameDelay;
 }
 
 void rotateFace(int face, bool isForward) {
