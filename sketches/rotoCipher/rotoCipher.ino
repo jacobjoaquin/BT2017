@@ -56,7 +56,6 @@ const int ENCODING_MODE = 0;
 const int DECODING_MODE = 1;
 int mode = ENCODING_MODE;
 
-
 const int ledsPerStrip = 456;
 const int nStrips = 3;
 const int nFaces = 8;
@@ -91,6 +90,8 @@ int framesLeft = 64;
 int currentFace = 0;
 bool currentDirection = true;
 
+int tempDelay = 100;
+
 void setup() {
   createSineTable();
   createBeamBuffer();
@@ -101,6 +102,11 @@ void setup() {
   leds.show();
   delay(500);
   encode();
+
+  // Debugging
+  // Serial.begin(9600);
+  // debugPrintBeamBufferForwardReverse();
+  // delay(5000);
 }
 
 void loop() {
@@ -112,7 +118,8 @@ void loop() {
   rotateFace((currentFace + nFaces / 2) % nFaces, currentDirection);
 
   if (currentRotoStep == 0 && mode == ENCODING_MODE && framesLeft == rotoSteps[0].frames - 1) {
-    delay(5000);
+    delay(tempDelay);
+    tempDelay = 3000;
   }
 
 
@@ -148,11 +155,11 @@ void loop() {
 
 void encode() {
   currentFace = random(nFaces);
-  // currentFace = 0;
+  // currentFace = 3;
   framesLeft = 2 << random(1, 6);
   // framesLeft = 32;
   currentDirection = random(2) ? true : false;
-  // currentDirection = true;
+  // currentDirection = false;
 
   rotoSteps[currentRotoStep].face = currentFace;
   rotoSteps[currentRotoStep].frames = framesLeft;
@@ -174,18 +181,18 @@ void displayLEDs() {
 
 void rotateFace(int face, bool isForward) {
   if (isForward) {
-    int tempIndex = getFaceLED(face, 0);
+    int beamBufferTemp = beamBuffer[getFaceLED(face, 0)];
 
     for (int i = 0; i < ledsPerFace - 1; i++) {
       beamBuffer[getFaceLED(face, i)] = beamBuffer[getFaceLED(face, i + 1)];
     }
-    beamBuffer[getFaceLED(face, ledsPerFace - 1)] = beamBuffer[tempIndex];
+    beamBuffer[getFaceLED(face, ledsPerFace - 1)] = beamBufferTemp;
   } else {
-    int tempIndex = getFaceLED(face, ledsPerFace - 1);
+    int beamBufferTemp = beamBuffer[getFaceLED(face, ledsPerFace - 1)];
 
     for (int i = ledsPerFace - 2; i >= 0; i--) {
       beamBuffer[getFaceLED(face, i + 1)] = beamBuffer[getFaceLED(face, i)];
     }
-    beamBuffer[getFaceLED(face, 0)] = beamBuffer[tempIndex];
+    beamBuffer[getFaceLED(face, 0)] = beamBufferTemp;
   }
 }
