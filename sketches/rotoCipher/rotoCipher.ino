@@ -42,6 +42,21 @@ pin 7:  LED strip #2
 #define setFaceLED(F, I, C) (leds.setPixel(pgm_read_word(&faceTable[(F) * ledsPerFace + (I)]), (C)))
 #define getFaceLED(F, I) (pgm_read_word(&faceTable[(F) * ledsPerFace + (I)]))
 
+
+struct RotoStep {
+  int face;
+  int frames;
+  bool direction;
+};
+
+const int nSteps = 16;
+RotoStep rotoSteps[nSteps];
+int currentRotoStep = 0;
+const int ENCODING_MODE = 0;
+const int DECODING_MODE = 1;
+int mode = ENCODING_MODE;
+
+
 const int ledsPerStrip = 456;
 const int nStrips = 3;
 const int nFaces = 8;
@@ -86,15 +101,29 @@ void loop() {
 
   framesLeft--;
 
-
-  rotateFace(currentFace, true);
-  rotateFace((currentFace + nFaces / 2) % nFaces, true);
+  rotateFace(currentFace, false);
+  rotateFace((currentFace + nFaces / 2) % nFaces, false);
 
   if (framesLeft == 0) {
     currentFace = random(nFaces);
     framesLeft = 2 << random(1, 8);
   }
 
+  // if (framesLeft == 0) {
+  //   if (mode == ENCODING_MODE) {
+  //
+  //     currentFace = random(nFaces);
+  //     framesLeft = 2 << random(1, 8);
+  //
+  //     currentRotoStep++;
+  //
+  //     if (currentRotoStep == nSteps) {
+  //       mode = DECODING_MODE;
+  //       currentRotoStep--;
+  //     }
+  //   } else if (mode == DECODING_MODE) {
+  //   }
+  // }
 
   // Display
   beamBufferToLEDs();
@@ -110,10 +139,19 @@ void displayLEDs() {
 }
 
 void rotateFace(int face, bool isForward) {
-  int tempIndex = getFaceLED(face, 0);
-  // uint32_t tempColor = beamBuffer[tempIndex];
-  for (int i = 0; i < ledsPerFace - 1; i++) {
-    beamBuffer[getFaceLED(face, i)] = beamBuffer[getFaceLED(face, i + 1)];
+  if (isForward) {
+    int tempIndex = getFaceLED(face, 0);
+
+    for (int i = 0; i < ledsPerFace - 1; i++) {
+      beamBuffer[getFaceLED(face, i)] = beamBuffer[getFaceLED(face, i + 1)];
+    }
+    beamBuffer[getFaceLED(face, ledsPerFace - 1)] = beamBuffer[tempIndex];
+  } else {
+    int tempIndex = getFaceLED(face, ledsPerFace - 1);
+
+    for (int i = ledsPerFace - 2; i >= 0; i--) {
+      beamBuffer[getFaceLED(face, i + 1)] = beamBuffer[getFaceLED(face, i)];
+    }
+    beamBuffer[getFaceLED(face, 0)] = beamBuffer[tempIndex];
+    }
   }
-  beamBuffer[getFaceLED(face, ledsPerFace - 1)] = beamBuffer[tempIndex];
-}
