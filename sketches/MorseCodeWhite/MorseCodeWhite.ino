@@ -161,8 +161,14 @@ void loop() {
     phaseBank[i] = phase;
   }
 
+  displayLEDs();
+}
+
+ulong showTime = millis() + frameDelay;
+void displayLEDs() {
+  while(millis() < showTime) {}
   leds.show();
-  delay(frameDelay);
+  showTime = millis() + frameDelay;
 }
 
 void createSineTable() {

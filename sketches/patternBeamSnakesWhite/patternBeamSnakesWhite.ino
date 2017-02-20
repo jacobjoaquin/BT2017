@@ -88,8 +88,15 @@ void loop() {
     }
   }
   pos = (pos + 1) % ledsPerHalfBeam;
+
+  displayLEDs();
+}
+
+ulong showTime = millis() + frameDelay;
+void displayLEDs() {
+  while(millis() < showTime) {}
   leds.show();
-  delay(frameDelay);
+  showTime = millis() + frameDelay;
 }
 
 // Clear all the pixels
