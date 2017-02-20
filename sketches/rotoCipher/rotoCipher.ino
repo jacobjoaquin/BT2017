@@ -49,12 +49,17 @@ struct RotoStep {
   bool direction;
 };
 
-const int nSteps = 32;
+const int nSteps = 64;
 RotoStep rotoSteps[nSteps];
 int currentRotoStep = 0;
 const int ENCODING_MODE = 0;
 const int DECODING_MODE = 1;
 int mode = ENCODING_MODE;
+
+// Current Roto-cipher
+int framesLeft = 0;
+int currentFace = 0;
+bool currentDirection = true;
 
 const int ledsPerStrip = 456;
 const int nStrips = 3;
@@ -85,12 +90,8 @@ uint32_t magenta = rgb(255, 0, 128);
 uint32_t black = rgb(0, 0, 0);
 uint32_t white = rgb(255, 255, 255);
 
-//
-int framesLeft = 64;
-int currentFace = 0;
-bool currentDirection = true;
 
-int tempDelay = 100;
+int tempDelay = 2000;
 
 void setup() {
   createSineTable();
@@ -119,7 +120,6 @@ void loop() {
 
   if (currentRotoStep == 0 && mode == ENCODING_MODE && framesLeft == rotoSteps[0].frames - 1) {
     delay(tempDelay);
-    tempDelay = 3000;
   }
 
 
@@ -155,11 +155,8 @@ void loop() {
 
 void encode() {
   currentFace = random(nFaces);
-  // currentFace = 3;
-  framesLeft = 2 << random(1, 6);
-  // framesLeft = 32;
+  framesLeft = 2 << random(0, 6);
   currentDirection = random(2) ? true : false;
-  // currentDirection = false;
 
   rotoSteps[currentRotoStep].face = currentFace;
   rotoSteps[currentRotoStep].frames = framesLeft;
