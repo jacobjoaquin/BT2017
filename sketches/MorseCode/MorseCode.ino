@@ -161,8 +161,6 @@ void loop() {
     phaseBank[i] = phase;
   }
 
-  // leds.show();
-  // delay(frameDelay);
   displayLEDs();
 }
 
