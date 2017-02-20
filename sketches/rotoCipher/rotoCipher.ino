@@ -49,7 +49,7 @@ struct RotoStep {
   bool direction;
 };
 
-const int nSteps = 16;
+const int nSteps = 32;
 RotoStep rotoSteps[nSteps];
 int currentRotoStep = 0;
 const int ENCODING_MODE = 0;
@@ -89,11 +89,18 @@ uint32_t white = rgb(255, 255, 255);
 //
 int framesLeft = 64;
 int currentFace = 0;
+bool currentDirection = true;
 
 void setup() {
   createSineTable();
   createBeamBuffer();
   leds.begin();
+
+  // Show at beginning
+  beamBufferToLEDs();
+  leds.show();
+  delay(500);
+  encode();
 }
 
 void loop() {
@@ -101,37 +108,64 @@ void loop() {
 
   framesLeft--;
 
-  rotateFace(currentFace, false);
-  rotateFace((currentFace + nFaces / 2) % nFaces, false);
+  rotateFace(currentFace, currentDirection);
+  rotateFace((currentFace + nFaces / 2) % nFaces, currentDirection);
 
-  if (framesLeft == 0) {
-    currentFace = random(nFaces);
-    framesLeft = 2 << random(1, 8);
+  if (currentRotoStep == 0 && mode == ENCODING_MODE && framesLeft == rotoSteps[0].frames - 1) {
+    delay(5000);
   }
 
-  // if (framesLeft == 0) {
-  //   if (mode == ENCODING_MODE) {
-  //
-  //     currentFace = random(nFaces);
-  //     framesLeft = 2 << random(1, 8);
-  //
-  //     currentRotoStep++;
-  //
-  //     if (currentRotoStep == nSteps) {
-  //       mode = DECODING_MODE;
-  //       currentRotoStep--;
-  //     }
-  //   } else if (mode == DECODING_MODE) {
-  //   }
-  // }
+
+  if (framesLeft == 0) {
+    if (mode == ENCODING_MODE) {
+      currentRotoStep++;
+
+      if (currentRotoStep < nSteps) {
+        encode();
+      } else {
+        mode = DECODING_MODE;
+        currentRotoStep--;
+        decode();
+      }
+
+    } else if (mode == DECODING_MODE) {
+      currentRotoStep--;
+
+      if (currentRotoStep >= 0) {
+        decode();
+      } else {
+        mode = ENCODING_MODE;
+        currentRotoStep++;
+        encode();
+      }
+    }
+  }
 
   // Display
   beamBufferToLEDs();
   displayLEDs();
 }
 
-ulong showTime = millis() + frameDelay;
+void encode() {
+  currentFace = random(nFaces);
+  // currentFace = 0;
+  framesLeft = 2 << random(1, 6);
+  // framesLeft = 32;
+  currentDirection = random(2) ? true : false;
+  // currentDirection = true;
 
+  rotoSteps[currentRotoStep].face = currentFace;
+  rotoSteps[currentRotoStep].frames = framesLeft;
+  rotoSteps[currentRotoStep].direction = currentDirection;
+}
+
+void decode() {
+  currentFace = rotoSteps[currentRotoStep].face;
+  framesLeft = rotoSteps[currentRotoStep].frames;
+  currentDirection = !rotoSteps[currentRotoStep].direction;
+}
+
+ulong showTime = millis() + frameDelay;
 void displayLEDs() {
   while(millis() < showTime) {}
   leds.show();
@@ -153,5 +187,5 @@ void rotateFace(int face, bool isForward) {
       beamBuffer[getFaceLED(face, i + 1)] = beamBuffer[getFaceLED(face, i)];
     }
     beamBuffer[getFaceLED(face, 0)] = beamBuffer[tempIndex];
-    }
   }
+}
