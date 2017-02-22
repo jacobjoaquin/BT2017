@@ -118,7 +118,7 @@ void loop() {
   framesLeft--;
 
   rotateFace(currentFace, currentDirection);
-  // rotateFace((currentFace + nFaces / 2) % nFaces, currentDirection);
+  rotateFace((currentFace + nFaces / 2) % nFaces, currentDirection);
 
   // Pause before Encoding process
   if (currentRotoStep == 0 && mode == ENCODING_MODE && framesLeft == rotoSteps[0].frames - 1) {
