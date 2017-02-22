@@ -86,7 +86,7 @@ uint32_t beamBuffer[nLeds] = {0};
 uint32_t beamBufferTemp[nLeds] = {0};
 
 // Colors
-uint32_t orange = rgb(255, 48, 0);
+uint32_t orange = rgb(255, 64, 0);
 uint32_t magenta = rgb(255, 0, 128);
 uint32_t black = rgb(0, 0, 0);
 uint32_t white = rgb(255, 255, 255);
