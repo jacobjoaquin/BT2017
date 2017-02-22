@@ -83,9 +83,10 @@ float stripToSineTableSize = 1.0 / (float) ledsPerStrip * (float) sineTableSize;
 
 // Buffer
 uint32_t beamBuffer[nLeds] = {0};
+uint32_t beamBufferTemp[nLeds] = {0};
 
 // Colors
-uint32_t orange = rgb(255, 64, 0);
+uint32_t orange = rgb(255, 48, 0);
 uint32_t magenta = rgb(255, 0, 128);
 uint32_t black = rgb(0, 0, 0);
 uint32_t white = rgb(255, 255, 255);
@@ -117,7 +118,7 @@ void loop() {
   framesLeft--;
 
   rotateFace(currentFace, currentDirection);
-  rotateFace((currentFace + nFaces / 2) % nFaces, currentDirection);
+  // rotateFace((currentFace + nFaces / 2) % nFaces, currentDirection);
 
   // Pause before Encoding process
   if (currentRotoStep == 0 && mode == ENCODING_MODE && framesLeft == rotoSteps[0].frames - 1) {
@@ -161,9 +162,15 @@ void loop() {
 }
 
 void encode() {
-  currentFace = random(nFaces);
+  int lastFace = currentFace;
+  currentFace = random(nFaces / 2);
+  if (currentFace == lastFace) {
+    currentDirection = !currentDirection;
+  } else {
+    currentDirection = random(2) ? true : false;
+  }
+
   framesLeft = 1 << random(0, 8);
-  currentDirection = random(2) ? true : false;
 
   rotoSteps[currentRotoStep].face = currentFace;
   rotoSteps[currentRotoStep].frames = framesLeft;

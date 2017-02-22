@@ -50,7 +50,7 @@ OctoWS2811 leds(ledsPerStrip, displayMemory, drawingMemory, config);
 
 // User defined variables
 uint32_t orange = rgb(255, 64, 0);
-uint32_t magenta = rgb(255, 0, 192);
+uint32_t magenta = rgb(255, 0, 92);
 uint32_t black = rgb(0, 0, 0);
 uint32_t white = rgb(255, 255, 255);
 int pos = 0;
@@ -90,7 +90,7 @@ void loop() {
     }
   }
   pos = (pos + 1) % ledsPerHalfBeam;
-  
+
   displayLEDs();
 }
 
