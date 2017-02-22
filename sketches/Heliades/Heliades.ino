@@ -62,6 +62,7 @@ void setup() {
 
 void loop() {
   clear();
+  int third = ledsPerStrip / 3;
 
   for (int i = 0; i < ledsPerStrip; i++) {
     int r = ledsPerStrip - i - 1;
@@ -71,24 +72,32 @@ void loop() {
     bool reverse = heliadesReverse[reverseOffset];
 
     if (forward) {
-      int brightness = random(200, 255);
+      int brightness = random(0, 255);
       int color = rgb(brightness, brightness, brightness);
       leds.setPixel(i, color);
-      leds.setPixel(i + ledsPerStrip, color);
-      leds.setPixel(i + 2 *ledsPerStrip, color);
+      leds.setPixel((i + third) % ledsPerStrip + ledsPerStrip, color);
+      leds.setPixel((i + 2 * third) % ledsPerStrip + 2 *ledsPerStrip, color);
     }
     if (reverse) {
-      int brightness = random(200, 255);
+      int brightness = random(0, 255);
       int color = rgb(brightness, brightness, brightness);
       leds.setPixel(i, color);
-      leds.setPixel(i + ledsPerStrip, color);
-      leds.setPixel(i + 2 *ledsPerStrip, color);
+      leds.setPixel((i + third) + ledsPerStrip, color);
+      leds.setPixel((i + 2 * third) % ledsPerStrip + 2 *ledsPerStrip, color);
     }
   }
 
   offset = (offset + 1) % ledsPerStrip;
+  // leds.show();
+  // delay(frameDelay);
+  displayLEDs();
+}
+
+ulong showTime = millis() + frameDelay;
+void displayLEDs() {
+  while(millis() < showTime) {}
   leds.show();
-  delay(frameDelay);
+  showTime = millis() + frameDelay;
 }
 
 // Clear all the pixels
