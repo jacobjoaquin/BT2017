@@ -119,11 +119,17 @@ void loop() {
   rotateFace(currentFace, currentDirection);
   rotateFace((currentFace + nFaces / 2) % nFaces, currentDirection);
 
+  // Pause before Encoding process
   if (currentRotoStep == 0 && mode == ENCODING_MODE && framesLeft == rotoSteps[0].frames - 1) {
     delay(tempDelay);
   }
 
+  // Pause before Decoding Process
+  if (currentRotoStep == (nSteps - 1) && mode == DECODING_MODE && framesLeft == rotoSteps[nSteps - 1].frames - 1) {
+    delay(tempDelay);
+  }
 
+  // Initialize next encode/decode animation sequence
   if (framesLeft == 0) {
     if (mode == ENCODING_MODE) {
       currentRotoStep++;
@@ -156,7 +162,7 @@ void loop() {
 
 void encode() {
   currentFace = random(nFaces);
-  framesLeft = 2 << random(0, 6);
+  framesLeft = 1 << random(0, 8);
   currentDirection = random(2) ? true : false;
 
   rotoSteps[currentRotoStep].face = currentFace;
