@@ -55,15 +55,19 @@ void beamBufferToLEDs2() {
 }
 
 void beamBufferToLEDs3() {
+  uint32_t * beamPtr = beamBuffer;
+  int * sparklePtr = sparkleBuffer;
   for (int i = 0; i < nLeds; i++) {
-    uint32_t c = beamBuffer[i];
-    int amt = sparkleBuffer[i];
+    uint32_t c = *beamPtr;
+    int amt = *sparklePtr;
     c = lerpColor(shiftColor(c, 1), c, amt);
     leds.setPixel(i, c);
 
-    amt -= (random(8, 12));
+    amt -= (random(8, 16));
     amt += 256 * (amt < 0);
-    sparkleBuffer[i] = amt;
+    *sparklePtr = amt;
+    sparklePtr++;
+    beamPtr++;
   }
 }
 
