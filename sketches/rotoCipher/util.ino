@@ -16,6 +16,7 @@ void createBeamBuffer() {
 void createBeamBuffer2() {
   int tail = 8;
   int halfBeam = ledsPerBeam / 2 - tail;
+  int middle = 3;
 
   for (int i = 0; i < halfBeam; i++) {
     float amt = (float) i / (float) halfBeam;
@@ -26,8 +27,27 @@ void createBeamBuffer2() {
       beamBuffer[i + halfBeam + j * ledsPerBeam] = c1;
     }
   }
+
+  for (int i = 0; i < middle; i++) {
+    int offset = ledsPerBeam / 2;
+    uint32_t c0 = white;
+    uint32_t c1 = beamBuffer[i + offset];
+    uint32_t c2 = beamBuffer[offset - i - 1];
+    uint32_t c3 = lerpColor(c0, c1, (float) i / (float) middle);
+    uint32_t c4 = lerpColor(c0, c2, (float) i / (float) middle);
+    for (int j = 0; j < nBeams; j++) {
+      beamBuffer[i + offset + j * ledsPerBeam] = c3;
+      beamBuffer[offset - i - 1 + j * ledsPerBeam] = c4;
+    }
+  }
 }
 
+// Sparkle buffer
+void createSparkleBuffer() {
+  for (int i = 0; i < nLeds; i++) {
+    sparkleBuffer[i] = random(256);
+  }
+}
 
 // sets LEDs to contents of beamBuffer
 void beamBufferToLEDs() {
@@ -35,6 +55,36 @@ void beamBufferToLEDs() {
     leds.setPixel(i, beamBuffer[i]);
   }
 }
+
+void beamBufferToLEDs2() {
+  for (int i = 0; i < nLeds; i++) {
+    uint32_t c = 0;
+    if (random(256) < 16) {
+      c = lerpColor(0, beamBuffer[i], (int) random(256));
+    } else {
+      c = beamBuffer[i];
+    }
+    leds.setPixel(i, c);
+  }
+}
+
+void beamBufferToLEDs3() {
+  uint32_t * beamPtr = beamBuffer;
+  int * sparklePtr = sparkleBuffer;
+  for (int i = 0; i < nLeds; i++) {
+    uint32_t c = *beamPtr;
+    int amt = *sparklePtr;
+    c = lerpColor(shiftColor(c, 1), c, amt);
+    leds.setPixel(i, c);
+
+    amt -= (random(8, 16));
+    amt += 256 * (amt < 0);
+    *sparklePtr = amt;
+    sparklePtr++;
+    beamPtr++;
+  }
+}
+
 
 // Generate SineTable
 void createSineTable() {
