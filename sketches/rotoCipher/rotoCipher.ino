@@ -94,6 +94,9 @@ float stripToSineTableSize = 1.0 / (float) ledsPerStrip * (float) sineTableSize;
 uint32_t beamBuffer[nLeds] = {0};
 uint32_t beamBufferTemp[nLeds] = {0};
 
+// Sparkle Buffer
+int sparkleBuffer[nLeds] = {0};
+
 // Colors
 uint32_t orange = rgb(255, 64, 0);
 uint32_t magenta = rgb(255, 0, 128);
@@ -107,18 +110,13 @@ void setup() {
   createSineTable();
   // createBeamBuffer();
   createBeamBuffer2();
+  createSparkleBuffer();
   leds.begin();
 
   // Show at beginning
-  beamBufferToLEDs();
+  beamBufferToLEDs3();
   leds.show();
-  delay(500);
   encode();
-
-  // Debugging
-  // Serial.begin(9600);
-  // debugPrintBeamBufferForwardReverse();
-  // delay(5000);
 }
 
 void loop() {
@@ -164,7 +162,7 @@ void loop() {
   }
 
   // Display
-  beamBufferToLEDs2();
+  beamBufferToLEDs3();
   displayLEDs();
 }
 

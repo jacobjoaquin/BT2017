@@ -28,6 +28,12 @@ void createBeamBuffer2() {
   }
 }
 
+// Sparkle buffer
+void createSparkleBuffer() {
+  for (int i = 0; i < nLeds; i++) {
+    sparkleBuffer[i] = random(256);
+  }
+}
 
 // sets LEDs to contents of beamBuffer
 void beamBufferToLEDs() {
@@ -45,6 +51,19 @@ void beamBufferToLEDs2() {
       c = beamBuffer[i];
     }
     leds.setPixel(i, c);
+  }
+}
+
+void beamBufferToLEDs3() {
+  for (int i = 0; i < nLeds; i++) {
+    uint32_t c = beamBuffer[i];
+    int amt = sparkleBuffer[i];
+    c = lerpColor(shiftColor(c, 1), c, amt);
+    leds.setPixel(i, c);
+
+    amt -= (random(8, 12));
+    amt += 256 * (amt < 0);
+    sparkleBuffer[i] = amt;
   }
 }
 
