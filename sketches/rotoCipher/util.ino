@@ -36,6 +36,19 @@ void beamBufferToLEDs() {
   }
 }
 
+void beamBufferToLEDs2() {
+  for (int i = 0; i < nLeds; i++) {
+    uint32_t c = 0;
+    if (random(256) < 16) {
+      c = lerpColor(0, beamBuffer[i], (int) random(256));
+    } else {
+      c = beamBuffer[i];
+    }
+    leds.setPixel(i, c);
+  }
+}
+
+
 // Generate SineTable
 void createSineTable() {
   for (int i = 0; i < sineTableSize; i++) {

@@ -49,12 +49,18 @@ struct RotoStep {
   bool direction;
 };
 
+
+enum Mode {
+  ENCODING_MODE,
+  DECODING_MODE
+};
+
 const int nSteps = 64;
 RotoStep rotoSteps[nSteps];
 int currentRotoStep = 0;
-const int ENCODING_MODE = 0;
-const int DECODING_MODE = 1;
-int mode = ENCODING_MODE;
+// const int ENCODING_MODE = 0;
+// const int DECODING_MODE = 1;
+Mode mode = ENCODING_MODE;
 
 // Current Roto-cipher
 int framesLeft = 0;
@@ -157,7 +163,7 @@ void loop() {
   }
 
   // Display
-  beamBufferToLEDs();
+  beamBufferToLEDs2();
   displayLEDs();
 }
 
