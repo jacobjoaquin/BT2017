@@ -52,7 +52,9 @@ struct RotoStep {
 
 enum Mode {
   ENCODING_MODE,
-  DECODING_MODE
+  DECODING_MODE,
+  ENCODING_PAUSE_MODE,
+  DECODING_PAUSE_MODE
 };
 
 const int nSteps = 64;
@@ -61,6 +63,7 @@ int currentRotoStep = 0;
 // const int ENCODING_MODE = 0;
 // const int DECODING_MODE = 1;
 Mode mode = ENCODING_MODE;
+int pauseFrames = 300;
 
 // Current Roto-cipher
 int framesLeft = 0;
@@ -123,17 +126,9 @@ void loop() {
 
   framesLeft--;
 
-  rotateFace(currentFace, currentDirection);
-  rotateFace((currentFace + nFaces / 2) % nFaces, currentDirection);
-
-  // Pause before Encoding process
-  if (currentRotoStep == 0 && mode == ENCODING_MODE && framesLeft == rotoSteps[0].frames - 1) {
-    delay(tempDelay);
-  }
-
-  // Pause before Decoding Process
-  if (currentRotoStep == (nSteps - 1) && mode == DECODING_MODE && framesLeft == rotoSteps[nSteps - 1].frames - 1) {
-    delay(tempDelay);
+  if (mode == ENCODING_MODE || mode == DECODING_MODE) {
+    rotateFace(currentFace, currentDirection);
+    rotateFace((currentFace + nFaces / 2) % nFaces, currentDirection);
   }
 
   // Initialize next encode/decode animation sequence
@@ -144,21 +139,27 @@ void loop() {
       if (currentRotoStep < nSteps) {
         encode();
       } else {
-        mode = DECODING_MODE;
-        currentRotoStep--;
-        decode();
+        mode = ENCODING_PAUSE_MODE;
+        framesLeft = pauseFrames;
       }
-
     } else if (mode == DECODING_MODE) {
       currentRotoStep--;
 
       if (currentRotoStep >= 0) {
         decode();
       } else {
-        mode = ENCODING_MODE;
-        currentRotoStep++;
-        encode();
+        mode = DECODING_PAUSE_MODE;
+        framesLeft = pauseFrames;
       }
+    } else if (mode == ENCODING_PAUSE_MODE) {
+      mode = DECODING_MODE;
+      currentRotoStep--;
+      decode();
+
+    } else if (mode == DECODING_PAUSE_MODE) {
+      mode = ENCODING_MODE;
+      currentRotoStep++;
+      encode();
     }
   }
 
