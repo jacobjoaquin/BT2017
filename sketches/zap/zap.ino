@@ -67,9 +67,8 @@ struct Zap {
 
 const int nZaps = 800;
 Zap zapList[nZaps];
-int zapLength = 4;
+int zapLength = 5;
 int zapFrames = 20;
-
 int zapIndex = 0;
 
 void initZapList() {
@@ -89,6 +88,10 @@ void newZap() {
   zPtr->position = random(nLeds);
   zPtr->direction = random(2) ? 1 : -1;
   zPtr->framesLeft = zapFrames;
+  zPtr->length = random(3, 9);
+  zPtr->color = white;
+  // zPtr->color = random(2) ? rgb(0, 255, 0) : rgb(255, 255, 0);
+  // zPtr->color = random(2) ? rgb(0, 255, 255) : rgb(255, 255, 255);
   zapIndex = (zapIndex + 1) % nZaps;
 }
 
@@ -96,27 +99,18 @@ void updateZaps() {
   struct Zap * zPtr = zapList;
   for (int i = 0; i < nZaps; i++) {
     if (zPtr->framesLeft > 0) {
-      // buffer[zPtr->position] = white;
       zPtr->framesLeft--;
-
-
       zPtr->position += zPtr->direction;
-      uint32_t c = lerpColor(zPtr->color, 0, float(zPtr->framesLeft) / (float) zapFrames);
-      // uint32_t c = white;
-
+      // uint32_t c = lerpColor(zPtr->color, 0, float(zPtr->framesLeft) / (float) zapFrames);
+      uint32_t c = lerpColor(0, zPtr->color, float(zPtr->framesLeft) / (float) zapFrames);
       int length = zPtr->length;
       int position = zPtr->position;
       int direction = zPtr->direction;
 
-      for (int j = 0; j < zapLength; j++) {
+      for (int j = 0; j < length; j++) {
         int index = position + j;
-        if (index < 0) {
-          index += nLeds;
-        } else if (index >= nLeds) {
-          index -= nLeds;
-        }
-        // index += nLeds * (index < 0);
-        // index -= nLeds * (index >= nLeds);
+        index += nLeds * (index < 0);
+        index -= nLeds * (index >= nLeds);
         buffer[index] = c;
       }
     }
@@ -125,8 +119,17 @@ void updateZaps() {
 }
 
 void bufferToLEDs() {
+  // for (int i = 0; i < nLeds; i++) {
+  //   leds.setPixel(i, buffer[i]);
+  // }
+
+  uint32_t * bufferPtr = buffer;
   for (int i = 0; i < nLeds; i++) {
-    leds.setPixel(i, buffer[i]);
+    uint32_t c = *bufferPtr;
+    int amt = random(256);
+    c = lerpColor(0, c, amt);
+    leds.setPixel(i, c);
+    bufferPtr++;
   }
 }
 
