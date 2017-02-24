@@ -1,5 +1,5 @@
 /*
-zap.ino
+shimmer.ino
 Coded by Jacob Joaquin.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -56,8 +56,8 @@ uint32_t white = rgb(255, 255, 255);
 // LED Buffer
 uint32_t buffer[nLeds] = {0};
 
-// Zap
-struct Zap {
+// Sparkle
+struct Sparkle {
   int position;
   int length;
   int direction;
@@ -65,17 +65,17 @@ struct Zap {
   int framesLeft;
 };
 
-const int nZaps = 800;
-Zap zapList[nZaps];
-int zapLength = 5;
-int zapFrames = 20;
-int zapIndex = 0;
+const int nSparkles = 800;
+Sparkle sparkleList[nSparkles];
+int sparkleLength = 5;
+int sparkleFrames = 20;
+int sparkleIndex = 0;
 
-void initZapList() {
-  struct Zap * zPtr = zapList;
-  for (int i = 0; i < nZaps; i++) {
+void initSparkleList() {
+  struct Sparkle * zPtr = sparkleList;
+  for (int i = 0; i < nSparkles; i++) {
     zPtr->position = 0;
-    zPtr->length = zapLength;
+    zPtr->length = sparkleLength;
     zPtr->direction = 0;
     zPtr->color = white;
     zPtr->framesLeft = 0;
@@ -83,31 +83,25 @@ void initZapList() {
   }
 }
 
-void newZap() {
-  Zap * zPtr = &zapList[zapIndex];
+void newSparkle() {
+  Sparkle * zPtr = &sparkleList[sparkleIndex];
   zPtr->position = random(nLeds);
   zPtr->direction = random(2) ? 1 : -1;
-  zPtr->framesLeft = zapFrames;
-  // zPtr->length = random(3, 9);
+  zPtr->framesLeft = sparkleFrames;
   zPtr->length = random(1, 6);
-  // zPtr->length = 4;
   zPtr->color = white;
-  // zPtr->color = random(2) ? rgb(0, 255, 0) : rgb(255, 255, 0);
-  // zPtr->color = random(2) ? rgb(0, 255, 255) : rgb(255, 255, 255);
-  zapIndex = (zapIndex + 1) % nZaps;
+  sparkleIndex = (sparkleIndex + 1) % nSparkles;
 }
 
-void updateZaps() {
-  struct Zap * zPtr = zapList;
-  for (int i = 0; i < nZaps; i++) {
+void updateSparkles() {
+  struct Sparkle * zPtr = sparkleList;
+  for (int i = 0; i < nSparkles; i++) {
     if (zPtr->framesLeft > 0) {
       zPtr->framesLeft--;
       zPtr->position += zPtr->direction;
-      uint32_t c = lerpColor(zPtr->color, 0, float(zPtr->framesLeft) / (float) zapFrames);
-      // uint32_t c = lerpColor(0, zPtr->color, float(zPtr->framesLeft) / (float) zapFrames);
+      uint32_t c = lerpColor(zPtr->color, 0, float(zPtr->framesLeft) / (float) sparkleFrames);
       int length = zPtr->length;
       int position = zPtr->position;
-      int direction = zPtr->direction;
 
       for (int j = 0; j < length; j++) {
         int index = position + j;
@@ -121,11 +115,9 @@ void updateZaps() {
 }
 
 void bufferToLEDs() {
-  // for (int i = 0; i < nLeds; i++) {
-  //   leds.setPixel(i, buffer[i]);
-  // }
-
   uint32_t * bufferPtr = buffer;
+
+  // Add additional sparkle
   for (int i = 0; i < nLeds; i++) {
     uint32_t c = *bufferPtr;
     int amt = random(256);
@@ -136,19 +128,19 @@ void bufferToLEDs() {
 }
 
 void setup() {
-  initZapList();
+  initSparkleList();
   leds.begin();
 }
 
 void loop() {
   memset(&buffer[0], 0, sizeof(buffer));
   clear();
-  newZap();
-  newZap();
-  newZap();
-  newZap();
-  newZap();
-  updateZaps();
+  newSparkle();
+  newSparkle();
+  newSparkle();
+  newSparkle();
+  newSparkle();
+  updateSparkles();
   bufferToLEDs();
   displayLEDs();
 }

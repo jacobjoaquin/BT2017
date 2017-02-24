@@ -2,7 +2,7 @@
 
 ## Patterns for Display
 
-- zap
+- shimmer
 - rotoCipher
 - patternBeamSnakes
 - patternBeamSnakesWhite
