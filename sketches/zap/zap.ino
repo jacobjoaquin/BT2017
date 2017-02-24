@@ -88,7 +88,9 @@ void newZap() {
   zPtr->position = random(nLeds);
   zPtr->direction = random(2) ? 1 : -1;
   zPtr->framesLeft = zapFrames;
-  zPtr->length = random(3, 9);
+  // zPtr->length = random(3, 9);
+  zPtr->length = random(1, 6);
+  // zPtr->length = 4;
   zPtr->color = white;
   // zPtr->color = random(2) ? rgb(0, 255, 0) : rgb(255, 255, 0);
   // zPtr->color = random(2) ? rgb(0, 255, 255) : rgb(255, 255, 255);
@@ -101,8 +103,8 @@ void updateZaps() {
     if (zPtr->framesLeft > 0) {
       zPtr->framesLeft--;
       zPtr->position += zPtr->direction;
-      // uint32_t c = lerpColor(zPtr->color, 0, float(zPtr->framesLeft) / (float) zapFrames);
-      uint32_t c = lerpColor(0, zPtr->color, float(zPtr->framesLeft) / (float) zapFrames);
+      uint32_t c = lerpColor(zPtr->color, 0, float(zPtr->framesLeft) / (float) zapFrames);
+      // uint32_t c = lerpColor(0, zPtr->color, float(zPtr->framesLeft) / (float) zapFrames);
       int length = zPtr->length;
       int position = zPtr->position;
       int direction = zPtr->direction;
@@ -141,6 +143,8 @@ void setup() {
 void loop() {
   memset(&buffer[0], 0, sizeof(buffer));
   clear();
+  newZap();
+  newZap();
   newZap();
   newZap();
   newZap();
