@@ -2,6 +2,7 @@
 
 ## Patterns for Display
 
+- zap
 - rotoCipher
 - patternBeamSnakes
 - patternBeamSnakesWhite
