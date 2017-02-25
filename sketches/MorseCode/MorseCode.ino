@@ -58,8 +58,8 @@ float sineTable[sineTableSize] = {0};
 float stripToSineTableSize = 1.0 / (float) ledsPerStrip * (float) sineTableSize;
 
 // Colors
-uint32_t orange = rgb(255, 64, 0);
-uint32_t magenta = rgb(255, 0, 128);
+uint32_t orange = rgb(0, 0, 255);
+uint32_t magenta = rgb(0, 255, 255);
 uint32_t black = rgb(0, 0, 0);
 uint32_t white = rgb(255, 255, 255);
 

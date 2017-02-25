@@ -65,7 +65,7 @@ struct Sparkle {
   int framesLeft;
 };
 
-const int nSparkles = 800;
+const int nSparkles = 400;
 Sparkle sparkleList[nSparkles];
 int sparkleLength = 5;
 int sparkleFrames = 20;
