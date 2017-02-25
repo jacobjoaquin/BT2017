@@ -60,8 +60,6 @@ enum Mode {
 const int nSteps = 64;
 RotoStep rotoSteps[nSteps];
 int currentRotoStep = 0;
-// const int ENCODING_MODE = 0;
-// const int DECODING_MODE = 1;
 Mode mode = ENCODING_MODE;
 int pauseFrames = 300;
 
@@ -103,13 +101,10 @@ uint32_t magenta = rgb(255, 0, 128);
 uint32_t black = rgb(0, 0, 0);
 uint32_t white = rgb(255, 255, 255);
 
-
-int tempDelay = 2000;
-
 void setup() {
   createSineTable();
-  // createBeamBuffer();
-  createBeamBuffer2();
+  createBeamBuffer();
+  // createBeamBuffer2();
   createSparkleBuffer();
   leds.begin();
 

@@ -13,20 +13,11 @@ void createBeamBuffer() {
   }
 }
 
+// With white in the middle
 void createBeamBuffer2() {
-  int tail = 8;
-  int halfBeam = ledsPerBeam / 2 - tail;
   int middle = 3;
 
-  for (int i = 0; i < halfBeam; i++) {
-    float amt = (float) i / (float) halfBeam;
-    uint32_t c0 = lerpColor(0, orange, amt);
-    uint32_t c1 = lerpColor(magenta, 0, amt);
-    for (int j = 0; j < nBeams; j++) {
-      beamBuffer[tail + i + j * ledsPerBeam] = c0;
-      beamBuffer[i + halfBeam + j * ledsPerBeam] = c1;
-    }
-  }
+  createBeamBuffer();
 
   for (int i = 0; i < middle; i++) {
     int offset = ledsPerBeam / 2;
