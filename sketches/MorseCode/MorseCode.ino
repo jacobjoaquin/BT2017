@@ -38,7 +38,7 @@ pin 7:  LED strip #2
 // Get encoded
 #define getEncoded(I) (pgm_read_byte(&encoded[(I)]))
 
-const int ledsPerStrip = 456;
+const int ledsPerStrip = 480;
 const int nStrips = 3;
 const int nFaces = 8;
 const int nLeds = ledsPerStrip * nStrips;
