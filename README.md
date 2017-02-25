@@ -2,6 +2,7 @@
 
 ## Patterns for Display
 
+- shimmer
 - rotoCipher
 - patternBeamSnakes
 - patternBeamSnakesWhite
