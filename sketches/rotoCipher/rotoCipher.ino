@@ -57,7 +57,7 @@ enum Mode {
   DECODING_PAUSE_MODE
 };
 
-const int nSteps = 64;
+const int nSteps = 80;
 RotoStep rotoSteps[nSteps];
 int currentRotoStep = 0;
 Mode mode = ENCODING_MODE;
@@ -96,7 +96,7 @@ uint32_t beamBufferTemp[nLeds] = {0};
 int sparkleBuffer[nLeds] = {0};
 
 // Colors
-uint32_t orange = rgb(255, 64, 0);
+uint32_t orange = rgb(255, 55, 0);
 uint32_t magenta = rgb(255, 0, 128);
 uint32_t black = rgb(0, 0, 0);
 uint32_t white = rgb(255, 255, 255);
