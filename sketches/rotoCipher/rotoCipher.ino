@@ -103,12 +103,14 @@ uint32_t white = rgb(255, 255, 255);
 
 void setup() {
   createSineTable();
-  createBeamBuffer();
+  // createBeamBuffer();
   // createBeamBuffer2();
+  createBeamBuffer3();
   createSparkleBuffer();
   leds.begin();
 
   // Show at beginning
+  clear();
   beamBufferToLEDs3();
   leds.show();
   encode();

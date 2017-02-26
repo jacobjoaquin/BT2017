@@ -33,6 +33,38 @@ void createBeamBuffer2() {
   }
 }
 
+
+// void createBeamBuffer2() {
+// }
+// Create the beamBuffer
+void createBeamBuffer3() {
+
+  int tail = 8;
+  int halfBeam = ledsPerBeam / 2 - tail;
+
+  for (int i = 0; i < halfBeam; i++) {
+    float amt = (float) i / (float) halfBeam;
+    uint32_t c0 = lerpColor(0, orange, amt);
+    uint32_t c1 = lerpColor(rgb(255, 0, 92), 0, amt);
+    for (int j = 0; j < nBeams; j++) {
+      beamBuffer[tail + i + j * ledsPerBeam] = c0;
+      beamBuffer[i + halfBeam + j * ledsPerBeam] = c1;
+    }
+  }
+
+  int middle = 24;
+
+  for (int i = 0; i < middle; i++) {
+    int offset = ledsPerBeam / 2 - middle / 2;
+    uint32_t c0 = orange;
+    uint32_t c1 = magenta;
+    uint32_t c3 = lerpColor(c0, c1, (float) i / (float) middle);
+    for (int j = 0; j < nBeams; j++) {
+      beamBuffer[i + offset + j * ledsPerBeam] = c3;
+    }
+  }
+}
+
 // Sparkle buffer
 void createSparkleBuffer() {
   for (int i = 0; i < nLeds; i++) {
@@ -68,8 +100,12 @@ void beamBufferToLEDs3() {
     c = lerpColor(shiftColor(c, 1), c, amt);
     leds.setPixel(i, c);
 
-    amt -= (random(8, 16));
-    amt += 256 * (amt < 0);
+    // amt -= (random(8, 16));
+    // amt += 256 * (amt < 0);
+
+    amt += (random(8, 16));
+    amt -= 256 * (amt >= 256);
+
     *sparklePtr = amt;
     sparklePtr++;
     beamPtr++;
