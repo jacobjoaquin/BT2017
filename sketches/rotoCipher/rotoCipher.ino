@@ -110,14 +110,15 @@ void setup() {
   leds.begin();
 
   // Show at beginning
+  clear();
   beamBufferToLEDs3();
-  // beamBufferToLEDs();
   leds.show();
-  delay(5000);
   encode();
 }
 
 void loop() {
+  // delay(1000);
+
   clear();
 
   framesLeft--;
