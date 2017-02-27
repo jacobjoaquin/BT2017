@@ -2,13 +2,16 @@
 
 ## Patterns for Display
 
-- shimmer
-- rotoCipher
-- patternBeamSnakes
-- patternBeamSnakesWhite
+Starting with what the pattern artist feels is the best:
+
 - MorseCode
+- rotoCipher
+- Shimmer
+- ShimmerWith Magenta
 - MorseCodeWhite
 - Heliades
+- patternBeamSnakes
+- patternBeamSnakesWhite
 
 ## Important!
 

@@ -97,14 +97,11 @@ void beamBufferToLEDs3() {
   for (int i = 0; i < nLeds; i++) {
     uint32_t c = *beamPtr;
     int amt = *sparklePtr;
-    c = lerpColor(shiftColor(c, 1), c, amt);
+    c = lerpColor(shiftColor(c, 2), c, amt);
     leds.setPixel(i, c);
 
-    // amt -= (random(8, 16));
-    // amt += 256 * (amt < 0);
-
-    amt += (random(8, 16));
-    amt -= 256 * (amt >= 256);
+    amt -= (random(8, 16));
+    amt += 256 * (amt < 0);
 
     *sparklePtr = amt;
     sparklePtr++;
